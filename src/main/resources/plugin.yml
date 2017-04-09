@@ -1,0 +1,9 @@
+# REQUIRED
+name: ${project.name}
+main: ${project.groupId}.${project.artifactId}.${project.name}
+version: ${project.version}
+depend: [Platform]
+
+# OPTIONAL
+description: Prison plugin
+load: STARTUP
