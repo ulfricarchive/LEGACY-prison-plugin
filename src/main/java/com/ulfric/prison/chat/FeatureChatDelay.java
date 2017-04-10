@@ -15,7 +15,7 @@ import com.ulfric.commons.locale.Locale;
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.inject.Inject;
 
-public final class FeatureChatDelay extends Container {
+public class FeatureChatDelay extends Container {
 
 	private static final long DELAY_MILLIS = 3000;
 
@@ -25,7 +25,7 @@ public final class FeatureChatDelay extends Container {
 		this.install(ChatListener.class);
 	}
 
-	private static final class ChatListener implements Listener
+	private static class ChatListener implements Listener
 	{
 
 		private final Map<UUID, Long> messageStamps = new ConcurrentHashMap<>();
@@ -50,7 +50,7 @@ public final class FeatureChatDelay extends Container {
 			if (this.requiresDelay(timestamp, currentTime))
 			{
 				event.setCancelled(true);
-				Bukkit.getScheduler().runTask(this.plugin, () -> player.sendMessage(this.getMessage()));
+				this.sendChatDelayMessage(player);
 			}
 		}
 
@@ -62,6 +62,11 @@ public final class FeatureChatDelay extends Container {
 		private boolean requiresDelay(Long timestamp, long currentTime)
 		{
 			return timestamp != null && (currentTime - timestamp) < FeatureChatDelay.DELAY_MILLIS;
+		}
+
+		private void sendChatDelayMessage(Player player)
+		{
+			Bukkit.getScheduler().runTask(this.plugin, () -> player.sendMessage(this.getMessage()));
 		}
 
 		private String getMessage()
