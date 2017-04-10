@@ -1,4 +1,4 @@
-package com.ulfric.prison.chat;
+package com.ulfric.prison.perk;
 
 import java.util.Map;
 import java.util.UUID;
@@ -15,7 +15,7 @@ import com.ulfric.commons.locale.Locale;
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.inject.Inject;
 
-public class FeatureChatDelay extends Container {
+class FeatureChatDelay extends Container {
 
 	private static final long DELAY_MILLIS = 3000;
 

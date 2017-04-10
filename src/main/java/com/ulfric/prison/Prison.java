@@ -2,8 +2,7 @@ package com.ulfric.prison;
 
 import com.ulfric.commons.spigot.plugin.UlfricPlugin;
 import com.ulfric.dragoon.container.Container;
-import com.ulfric.prison.capacity.FeatureJoinWhenFull;
-import com.ulfric.prison.chat.FeatureChatDelay;
+import com.ulfric.prison.perk.FeaturePerks;
 
 public final class Prison extends UlfricPlugin {
 
@@ -12,8 +11,7 @@ public final class Prison extends UlfricPlugin {
 	{
 		Container container = this.getContainer();
 
-		container.install(FeatureChatDelay.class);
-		container.install(FeatureJoinWhenFull.class);
+		container.install(FeaturePerks.class);
 	}
 
 }

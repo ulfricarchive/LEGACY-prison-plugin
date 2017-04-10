@@ -1,4 +1,4 @@
-package com.ulfric.prison.capacity;
+package com.ulfric.prison.perk;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -7,7 +7,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 
 import com.ulfric.dragoon.container.Container;
 
-public class FeatureJoinWhenFull extends Container {
+class FeatureJoinWhenFull extends Container {
 
 	@Override
 	public void onLoad()
