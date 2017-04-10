@@ -12,17 +12,12 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.Plugin;
 
 import com.ulfric.commons.locale.Locale;
-import com.ulfric.commons.locale.Message;
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.inject.Inject;
-import com.ulfric.dragoon.scope.Shared;
 
-@Shared
 public final class FeatureChatDelay extends Container {
 
 	private static final long DELAY_MILLIS = 3000;
-
-	private final Map<UUID, Long> messageStamps = new ConcurrentHashMap<>();
 
 	@Override
 	public void onLoad()
@@ -33,7 +28,8 @@ public final class FeatureChatDelay extends Container {
 	private static final class ChatListener implements Listener
 	{
 
-		@Inject private FeatureChatDelay chatDelay;
+		private final Map<UUID, Long> messageStamps = new ConcurrentHashMap<>();
+
 		@Inject private Plugin plugin;
 		@Inject private Locale locale;
 
@@ -49,7 +45,7 @@ public final class FeatureChatDelay extends Container {
 
 			long currentTime = System.currentTimeMillis();
 
-			Long timestamp = this.chatDelay.messageStamps.put(player.getUniqueId(), currentTime);
+			Long timestamp = this.messageStamps.put(player.getUniqueId(), currentTime);
 
 			if (this.requiresDelay(timestamp, currentTime))
 			{
@@ -70,7 +66,7 @@ public final class FeatureChatDelay extends Container {
 
 		private String getMessage()
 		{
-			return this.locale.getMessage("chat-delay").map(Message::toString).orElse("chat-delay");
+			return this.locale.getMessage("chat-delay").getText();
 		}
 
 	}
