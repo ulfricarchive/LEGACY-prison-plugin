@@ -2,7 +2,8 @@ package com.ulfric.prison;
 
 import com.ulfric.commons.spigot.plugin.UlfricPlugin;
 import com.ulfric.dragoon.container.Container;
-import com.ulfric.prison.perk.FeaturePerks;
+import com.ulfric.prison.command.ContainerCommands;
+import com.ulfric.prison.perk.ContainerPerks;
 
 public final class Prison extends UlfricPlugin {
 
@@ -11,7 +12,8 @@ public final class Prison extends UlfricPlugin {
 	{
 		Container container = this.getContainer();
 
-		container.install(FeaturePerks.class);
+		container.install(ContainerPerks.class);
+		container.install(ContainerCommands.class);
 	}
 
 }

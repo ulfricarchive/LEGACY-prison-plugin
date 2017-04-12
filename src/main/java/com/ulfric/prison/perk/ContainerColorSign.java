@@ -4,17 +4,18 @@ import java.util.function.BiConsumer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 
+import com.ulfric.commons.spigot.intercept.RequirePermission;
 import com.ulfric.dragoon.container.Container;
+import com.ulfric.dragoon.initialize.Initialize;
 
-class FeatureColorSign extends Container {
+class ContainerColorSign extends Container {
 
-	@Override
-	public void onLoad()
+	@Initialize
+	public void setup()
 	{
 		this.install(SignListener.class);
 	}
@@ -23,17 +24,10 @@ class FeatureColorSign extends Container {
 	{
 
 		@EventHandler
+		@RequirePermission(permission = "sign-color")
 		public void on(SignChangeEvent event)
 		{
-			if (this.hasColorPermission(event.getPlayer()))
-			{
-				this.reformatLines(event.getLines(), event::setLine);
-			}
-		}
-
-		private boolean hasColorPermission(Player player)
-		{
-			return player.hasPermission("sign.color");
+			this.reformatLines(event.getLines(), event::setLine);
 		}
 
 		private void reformatLines(String[] lines, BiConsumer<Integer, String> setLine)

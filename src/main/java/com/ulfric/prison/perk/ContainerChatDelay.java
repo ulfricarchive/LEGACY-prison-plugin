@@ -13,14 +13,15 @@ import org.bukkit.plugin.Plugin;
 
 import com.ulfric.commons.locale.Locale;
 import com.ulfric.dragoon.container.Container;
+import com.ulfric.dragoon.initialize.Initialize;
 import com.ulfric.dragoon.inject.Inject;
 
-class FeatureChatDelay extends Container {
+class ContainerChatDelay extends Container {
 
 	private static final long DELAY_MILLIS = 3000;
 
-	@Override
-	public void onLoad()
+	@Initialize
+	public void setup()
 	{
 		this.install(ChatListener.class);
 	}
@@ -56,12 +57,12 @@ class FeatureChatDelay extends Container {
 
 		private boolean canBypass(Player player)
 		{
-			return player.hasPermission("chatdelay.bypass");
+			return player.hasPermission("chatdelay-bypass");
 		}
 
 		private boolean requiresDelay(Long timestamp, long currentTime)
 		{
-			return timestamp != null && (currentTime - timestamp) < FeatureChatDelay.DELAY_MILLIS;
+			return timestamp != null && (currentTime - timestamp) < ContainerChatDelay.DELAY_MILLIS;
 		}
 
 		private void sendChatDelayMessage(Player player)

@@ -1,16 +1,17 @@
 package com.ulfric.prison.perk;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 
+import com.ulfric.commons.spigot.intercept.RequirePermission;
 import com.ulfric.dragoon.container.Container;
+import com.ulfric.dragoon.initialize.Initialize;
 
-class FeatureJoinWhenFull extends Container {
+class ContainerJoinWhenFull extends Container {
 
-	@Override
-	public void onLoad()
+	@Initialize
+	public void setup()
 	{
 		this.install(JoinListener.class);
 	}
@@ -19,9 +20,10 @@ class FeatureJoinWhenFull extends Container {
 	{
 
 		@EventHandler
+		@RequirePermission(permission = "maxjoin-bypass")
 		public void on(PlayerLoginEvent event)
 		{
-			if (this.joinedWhenFull(event) && this.canJoinWhenFull(event.getPlayer()))
+			if (this.joinedWhenFull(event))
 			{
 				this.allowToJoin(event);
 			}
@@ -30,11 +32,6 @@ class FeatureJoinWhenFull extends Container {
 		private boolean joinedWhenFull(PlayerLoginEvent event)
 		{
 			return event.getResult() == PlayerLoginEvent.Result.KICK_FULL;
-		}
-
-		private boolean canJoinWhenFull(Player player)
-		{
-			return player.hasPermission("maxjoin.bypass");
 		}
 
 		private void allowToJoin(PlayerLoginEvent event)
