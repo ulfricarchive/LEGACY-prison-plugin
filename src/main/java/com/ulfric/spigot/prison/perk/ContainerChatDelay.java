@@ -1,9 +1,10 @@
-package com.ulfric.prison.perk;
+package com.ulfric.spigot.prison.perk;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.ulfric.commons.spigot.text.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,7 +12,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.Plugin;
 
-import com.ulfric.commons.locale.Locale;
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;
 import com.ulfric.dragoon.inject.Inject;
@@ -32,7 +32,6 @@ class ContainerChatDelay extends Container {
 		private final Map<UUID, Long> messageStamps = new ConcurrentHashMap<>();
 
 		@Inject private Plugin plugin;
-		@Inject private Locale locale;
 
 		@EventHandler
 		public void on(AsyncPlayerChatEvent event)
@@ -67,12 +66,12 @@ class ContainerChatDelay extends Container {
 
 		private void sendChatDelayMessage(Player player)
 		{
-			Bukkit.getScheduler().runTask(this.plugin, () -> player.sendMessage(this.getMessage()));
+			Bukkit.getScheduler().runTask(this.plugin, () -> sendMessage(player));
 		}
 
-		private String getMessage()
+		private void sendMessage(Player player)
 		{
-			return this.locale.getMessage("chat-delay").getText();
+			Text.getService().sendMessage(player, "chat-delay");
 		}
 
 	}

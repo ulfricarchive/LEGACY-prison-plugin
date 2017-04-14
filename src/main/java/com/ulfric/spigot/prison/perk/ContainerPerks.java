@@ -1,4 +1,4 @@
-package com.ulfric.prison.perk;
+package com.ulfric.spigot.prison.perk;
 
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;
