@@ -11,6 +11,7 @@ public class ContainerPerks extends Container {
 		this.install(ContainerChatDelay.class);
 		this.install(ContainerJoinWhenFull.class);
 		this.install(ContainerColorSign.class);
+		this.install(ContainerDeathExperience.class);
 	}
 
 }
