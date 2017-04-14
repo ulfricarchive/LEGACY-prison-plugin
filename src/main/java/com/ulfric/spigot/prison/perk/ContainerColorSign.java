@@ -1,4 +1,4 @@
-package com.ulfric.prison.perk;
+package com.ulfric.spigot.prison.perk;
 
 import java.util.function.BiConsumer;
 
