@@ -14,12 +14,14 @@ import org.bukkit.entity.Player;
 public class CommandNight implements Command
 {
 
+    private static final long TIME = 19_500L;
+
     @Override
     public void run(Context context)
     {
         Player player = (Player) context.getSender();
 
-        player.setPlayerTime(19_500L, true);
+        player.setPlayerTime(CommandNight.TIME, true);
 
         Text.getService().sendMessage(player, "night-use");
     }
