@@ -19,11 +19,12 @@ public class WarpDeleteCommand extends WarpCommand {
     {
         WarpService service = ServiceUtils.getService(WarpService.class);
 
-        if(service.isWarp(this.name))
+        if (service.isWarp(this.name))
         {
             service.removeWarp(this.name);
 
             service.save();
+            service.updateNames();
 
             Text.getService().sendMessage(context.getSender(), "warp-delete");
         }

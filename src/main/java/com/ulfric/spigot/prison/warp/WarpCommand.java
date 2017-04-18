@@ -13,8 +13,7 @@ import org.bukkit.entity.Player;
 @Name("warp")
 @Permission("warp-use")
 @MustBePlayer
-public class WarpCommand implements Command
-{
+public class WarpCommand implements Command {
 
     @Argument
     protected String name;
@@ -24,7 +23,7 @@ public class WarpCommand implements Command
     {
         Player player = (Player) context.getSender();
 
-        if(Warps.getService().isWarp(this.name))
+        if (Warps.getService().isWarp(this.name))
         {
             Location location = Warps.getService().getWarp(this.name);
 

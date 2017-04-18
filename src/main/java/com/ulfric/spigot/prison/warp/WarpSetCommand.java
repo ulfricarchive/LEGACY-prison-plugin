@@ -10,7 +10,7 @@ import com.ulfric.commons.spigot.text.Text;
 import org.bukkit.entity.Player;
 
 @Name("set")
-@Alias("add")
+@Alias({"add", "create"})
 @Permission("warp-set")
 @MustBePlayer
 public class WarpSetCommand extends WarpCommand {
@@ -22,7 +22,7 @@ public class WarpSetCommand extends WarpCommand {
 
         WarpService service = ServiceUtils.getService(WarpService.class);
 
-        if(service.isWarp(this.name))
+        if (service.isWarp(this.name))
         {
             Text.getService().sendMessage(player, "warp-set-already");
         }
@@ -31,6 +31,7 @@ public class WarpSetCommand extends WarpCommand {
             service.addWarp(this.name, player.getLocation());
 
             service.save();
+            service.updateNames();
 
             Text.getService().sendMessage(player, "warp-set");
         }

@@ -2,14 +2,14 @@ package com.ulfric.spigot.prison.warp;
 
 public class WarpException extends RuntimeException {
 
-    protected WarpException(String s, Exception e)
+    protected WarpException(String message, Exception exception)
     {
-        super(s, e);
+        super(message, exception);
     }
 
-    protected WarpException(String s)
+    protected WarpException(String message)
     {
-        super(s);
+        super(message);
     }
 
     protected WarpException()
