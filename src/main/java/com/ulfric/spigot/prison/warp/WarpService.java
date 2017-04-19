@@ -101,6 +101,19 @@ public final class WarpService implements Warps {
     }
 
     @Override
+    public void updateWarp(String name, Location location)
+    {
+        if (location == null)
+        {
+            throw new WarpException("Location is null when updating warp, " + name);
+        }
+
+        this.warps.put(name, location);
+
+        this.save();
+    }
+
+    @Override
     public Location getWarp(String name)
     {
         return this.warps.get(name);

@@ -1,54 +1,25 @@
 package com.ulfric.spigot.prison.spawn;
 
-import com.ulfric.commons.spigot.data.Data;
-import com.ulfric.commons.spigot.data.DataStore;
-import com.ulfric.commons.spigot.data.PersistentData;
-import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;
-import com.ulfric.dragoon.inject.Inject;
-import com.ulfric.spigot.prison.util.serializer.LocationSerializer;
+import com.ulfric.spigot.prison.warp.Warps;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 
 public final class SpawnService implements Spawn {
 
-    public static DataStore getSpawnData(Container container)
-    {
-        return Data.getDataStore(container).getDataStore("spawn");
-    }
+    private static final String DEFAULT_SPAWN_NAME = "spawn";
 
-    @Inject
-    private Container container;
-
-    private DataStore folder;
     private Location spawn;
 
     @Initialize
     public void setup()
     {
-        this.folder = SpawnService.getSpawnData(this.container);
-
-        this.load();
+        this.updateSpawn();
     }
 
-    private void load()
+    private void updateSpawn()
     {
-        PersistentData data = this.folder.getData("spawn");
-
-        String context = data.getString("spawn");
-
-        if (context != null)
-        {
-            this.spawn = new LocationSerializer().from(context.trim());
-        }
-    }
-
-    private void save()
-    {
-        PersistentData data = this.folder.getData("spawn");
-
-        data.set("spawn", isSpawnSet() ? new LocationSerializer().to(this.spawn) : null);
-
-        data.save();
+        this.spawn = Warps.getService().getWarp(SpawnService.DEFAULT_SPAWN_NAME);
     }
 
     @Override
@@ -56,19 +27,34 @@ public final class SpawnService implements Spawn {
     {
         this.spawn = spawn;
 
-        this.save();
+        Warps.getService().updateWarp(SpawnService.DEFAULT_SPAWN_NAME, spawn);
     }
 
     @Override
     public Location getSpawn()
     {
+        this.updateSpawn();
+
         return this.spawn;
     }
 
     @Override
     public boolean isSpawnSet()
     {
-        return this.spawn != null;
+        return getSpawn() != null;
+    }
+
+    @Override
+    public void teleport(Entity entity)
+    {
+        Location spawn = getSpawn();
+
+        if (spawn == null)
+        {
+            throw new SpawnException("Spawn is not set");
+        }
+
+        entity.teleport(spawn);
     }
 
 }

@@ -5,6 +5,7 @@ import com.ulfric.commons.service.Service;
 import com.ulfric.commons.spigot.service.ServiceUtils;
 import com.ulfric.commons.version.Version;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 
 @Name("spawn")
 @Version(1)
@@ -20,5 +21,7 @@ public interface Spawn extends Service {
     Location getSpawn();
 
     boolean isSpawnSet();
+
+    void teleport(Entity entity);
 
 }

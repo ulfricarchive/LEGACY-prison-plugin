@@ -21,6 +21,8 @@ public interface Warps extends Service {
 
     void removeWarp(String name);
 
+    void updateWarp(String name, Location location);
+
     Location getWarp(String name);
 
     boolean isWarp(String name);
