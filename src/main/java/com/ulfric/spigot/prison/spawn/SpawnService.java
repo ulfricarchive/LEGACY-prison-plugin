@@ -1,6 +1,6 @@
 package com.ulfric.spigot.prison.spawn;
 
-import com.ulfric.dragoon.initialize.Initialize;
+import com.ulfric.spigot.prison.warp.Warp;
 import com.ulfric.spigot.prison.warp.Warps;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -9,33 +9,31 @@ public final class SpawnService implements Spawn {
 
     private static final String DEFAULT_SPAWN_NAME = "spawn";
 
-    private Location spawn;
-
-    @Initialize
-    public void setup()
-    {
-        this.updateSpawn();
-    }
-
-    private void updateSpawn()
-    {
-        this.spawn = Warps.getService().getWarp(SpawnService.DEFAULT_SPAWN_NAME);
-    }
-
     @Override
     public void setSpawn(Location spawn)
     {
-        this.spawn = spawn;
+        Warps warps = Warps.getService();
 
-        Warps.getService().updateWarp(SpawnService.DEFAULT_SPAWN_NAME, spawn);
+        if (spawn == null)
+        {
+            if (warps.isWarp(SpawnService.DEFAULT_SPAWN_NAME))
+            {
+                warps.removeWarp(SpawnService.DEFAULT_SPAWN_NAME);
+            }
+        }
+        else
+        {
+            warps.setWarp(SpawnService.DEFAULT_SPAWN_NAME, spawn);
+        }
+
     }
 
     @Override
     public Location getSpawn()
     {
-        this.updateSpawn();
+        Warp warp = Warps.getService().getWarp(SpawnService.DEFAULT_SPAWN_NAME);
 
-        return this.spawn;
+        return warp == null ? null : warp.getLocation();
     }
 
     @Override

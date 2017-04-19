@@ -13,24 +13,24 @@ import org.bukkit.entity.Player;
 @MustBePlayer
 public class SpawnCommand implements Command {
 
-    @Override
-    public void run(Context context)
-    {
-        Player player = (Player) context.getSender();
+	@Override
+	public void run(Context context)
+	{
+		Player player = (Player) context.getSender();
+		
+		Spawn spawn = Spawn.getService();
 
-        Spawn spawn = Spawn.getService();
+		if (spawn.isSpawnSet())
+		{
+			player.teleport(spawn.getSpawn());
 
-        if (spawn.isSpawnSet())
-        {
-            player.teleport(spawn.getSpawn());
+			Text.getService().sendMessage(player, "spawn-use");
+		}
+		else
+		{
+			Text.getService().sendMessage(player, "spawn-not-set");
+		}
 
-            Text.getService().sendMessage(player, "spawn-use");
-        }
-        else
-        {
-            Text.getService().sendMessage(player, "spawn-not-set");
-        }
-
-    }
+	}
 
 }

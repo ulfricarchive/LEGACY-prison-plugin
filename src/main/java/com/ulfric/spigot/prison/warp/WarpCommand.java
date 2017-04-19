@@ -25,7 +25,7 @@ public class WarpCommand implements Command {
 
         if (Warps.getService().isWarp(this.name))
         {
-            Location location = Warps.getService().getWarp(this.name);
+            Location location = Warps.getService().getWarp(this.name).getLocation();
 
             player.teleport(location);
 

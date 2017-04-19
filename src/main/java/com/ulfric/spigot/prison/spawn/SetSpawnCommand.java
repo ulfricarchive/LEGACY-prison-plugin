@@ -13,14 +13,14 @@ import org.bukkit.entity.Player;
 @MustBePlayer
 public class SetSpawnCommand implements Command {
 
-    @Override
-    public void run(Context context)
-    {
-        Player player = (Player) context.getSender();
+	@Override
+	public void run(Context context)
+	{
+		Player player = (Player) context.getSender();
 
-        Spawn.getService().setSpawn(player.getLocation());
+		Spawn.getService().setSpawn(player.getLocation());
 
-        Text.getService().sendMessage(player, "set-spawn");
-    }
+		Text.getService().sendMessage(player, "set-spawn");
+	}
 
 }

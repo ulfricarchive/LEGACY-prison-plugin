@@ -10,9 +10,7 @@ import com.ulfric.spigot.prison.util.serializer.LocationSerializer;
 import org.bukkit.Location;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Collections;
 import java.util.regex.Pattern;
 
@@ -29,7 +27,7 @@ public final class WarpService implements Warps {
     private Container container;
 
     private DataStore folder;
-    private final Map<String, Location> warps = new HashMap<>();
+    private final List<Warp> warps = new ArrayList<>();
     private final List<String> names = new ArrayList<>();
 
     @Initialize
@@ -58,7 +56,7 @@ public final class WarpService implements Warps {
 
                 if (location != null)
                 {
-                    addWarp(sections[0], location);
+                    this.warps.add(Warp.build().setName(sections[0]).setLocation(location).build());
                 }
 
             }
@@ -67,75 +65,77 @@ public final class WarpService implements Warps {
 
     }
 
-    protected void save()
+    private void save()
     {
         PersistentData data = this.folder.getData("warps");
 
-        List<String> warp = new ArrayList<>();
+        List<String> warps = new ArrayList<>();
 
-        this.warps.forEach((name, location) -> warp.add(name + WarpService.WARP_STORE_SEPARATOR.pattern() + new LocationSerializer().to(location)));
+        this.warps.forEach(warp -> warps.add(warp.getName() + WarpService.WARP_STORE_SEPARATOR.pattern() + new LocationSerializer().to(warp.getLocation())));
 
-        data.set("warps", warp);
+        data.set("warps", warps);
     }
 
     @Override
-    public void addWarp(String name, Location location)
-    {
-        if (this.warps.containsKey(name))
-        {
-            throw new WarpException("Warp, " + name + " already exists.");
-        }
-
-        this.warps.put(name, location);
-    }
-
-    @Override
-    public void removeWarp(String name)
-    {
-        if (!this.warps.containsKey(name))
-        {
-            throw new WarpException("Invalid warp, " + name + " when attempting to remove.");
-        }
-
-        this.warps.remove(name);
-    }
-
-    @Override
-    public void updateWarp(String name, Location location)
+    public void setWarp(String name, Location location)
     {
         if (location == null)
         {
             throw new WarpException("Location is null when updating warp, " + name);
         }
 
-        this.warps.put(name, location);
+        if (isWarp(name))
+        {
+            getWarp(name).setLocation(location);
+        }
+        else
+        {
+            this.warps.add(Warp.build().setName(name).setLocation(location).build());
+        }
 
         this.save();
+        this.updateNames();
     }
 
     @Override
-    public Location getWarp(String name)
+    public void removeWarp(String name)
     {
-        return this.warps.get(name);
+        if (!isWarp(name))
+        {
+            throw new WarpException("Invalid warp, " + name + " when attempting to remove.");
+        }
+
+        Warp warp = getWarp(name);
+
+        this.warps.remove(warp);
+
+        this.save();
+        this.updateNames();
+    }
+
+    @Override
+    public Warp getWarp(String name)
+    {
+        return this.warps.stream().filter(warp -> warp.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
     @Override
     public boolean isWarp(String name)
     {
-        return this.warps.containsKey(name);
+        return this.warps.stream().anyMatch(warp -> warp.getName().equalsIgnoreCase(name));
     }
 
     @Override
-    public Map<String, Location> getWarps()
+    public List<Warp> getWarps()
     {
-        return Collections.unmodifiableMap(this.warps);
+        return Collections.unmodifiableList(this.warps);
     }
 
-    protected void updateNames()
+    private void updateNames()
     {
         this.names.clear();
 
-        this.names.addAll(this.warps.keySet());
+        this.warps.forEach(warp -> this.names.add(warp.getName()));
 
         Collections.sort(this.names);
     }

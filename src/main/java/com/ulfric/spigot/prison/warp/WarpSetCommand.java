@@ -28,10 +28,7 @@ public class WarpSetCommand extends WarpCommand {
         }
         else
         {
-            service.addWarp(this.name, player.getLocation());
-
-            service.save();
-            service.updateNames();
+            service.setWarp(this.name, player.getLocation());
 
             Text.getService().sendMessage(player, "warp-set");
         }

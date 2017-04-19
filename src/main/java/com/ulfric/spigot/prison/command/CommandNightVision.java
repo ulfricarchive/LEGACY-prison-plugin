@@ -18,24 +18,24 @@ import org.bukkit.potion.PotionEffectType;
 public class CommandNightVision implements Command
 {
 
-    @Override
-    public void run(Context context)
-    {
-        Player player = (Player) context.getSender();
+	@Override
+	public void run(Context context)
+	{
+		Player player = (Player) context.getSender();
 
-        if(player.hasPotionEffect(PotionEffectType.NIGHT_VISION))
-        {
-            player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+		if(player.hasPotionEffect(PotionEffectType.NIGHT_VISION))
+		{
+			player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
-            Text.getService().sendMessage(player, "nightvision-use-off");
-        }
-        else
-        {
-            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
+			Text.getService().sendMessage(player, "nightvision-use-off");
+		}
+		else
+		{
+			player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
 
-            Text.getService().sendMessage(player, "nightvision-use-on");
-        }
+			Text.getService().sendMessage(player, "nightvision-use-on");
+		}
 
-    }
+	}
 
 }
