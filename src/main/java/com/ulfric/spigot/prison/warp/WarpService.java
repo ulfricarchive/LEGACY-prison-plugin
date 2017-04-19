@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Collections;
 import java.util.regex.Pattern;
 
-public class WarpService implements Warps {
+public final class WarpService implements Warps {
 
     public static DataStore getWarpData(Container container)
     {

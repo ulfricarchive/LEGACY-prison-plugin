@@ -1,25 +1,25 @@
 package com.ulfric.spigot.prison.perk;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.ulfric.commons.spigot.data.Data;
+import com.ulfric.commons.spigot.data.DataStore;
+import com.ulfric.commons.spigot.task.Tasks;
 import com.ulfric.commons.spigot.text.Text;
-import org.bukkit.Bukkit;
+import com.ulfric.dragoon.inject.Inject;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.plugin.Plugin;
 
-import com.ulfric.commons.locale.Locale;
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;
-import com.ulfric.dragoon.inject.Inject;
 
 class ContainerChatDelay extends Container {
-
-	private static final long DELAY_MILLIS = 3000;
 
 	@Initialize
 	public void setup()
@@ -30,49 +30,46 @@ class ContainerChatDelay extends Container {
 	private static class ChatListener implements Listener
 	{
 
-		private final Map<UUID, Long> messageStamps = new ConcurrentHashMap<>();
+		@Inject
+		private Container owner;
 
-		@Inject private Plugin plugin;
+		private long delay = 3000;
+		private final Map<UUID, Instant> messageStamps = new ConcurrentHashMap<>();
 
-		@EventHandler
+		@Initialize
+		public void setup()
+		{
+			DataStore dataStore = Data.getDataStore(this.owner).getDataStore("chat-delay");
+
+			this.delay = dataStore.getData("chat").getInt("chat-delay");
+		}
+
+		@EventHandler(ignoreCancelled = true)
+		// todo: permission annotation so it won't run for people with permission 'chatdelay-bypass'
 		public void on(AsyncPlayerChatEvent event)
 		{
 			Player player = event.getPlayer();
 
-			if (this.canBypass(player))
-			{
-				return;
-			}
+			Instant current = Instant.now();
 
-			long currentTime = System.currentTimeMillis();
-
-			Long timestamp = this.messageStamps.put(player.getUniqueId(), currentTime);
-
-			if (this.requiresDelay(timestamp, currentTime))
+			if (this.requiresDelay(player, current))
 			{
 				event.setCancelled(true);
-				this.sendChatDelayMessage(player);
+
+				Tasks.run(() -> Text.getService().sendMessage(player, "chat-delay"));
 			}
+			else
+			{
+				this.messageStamps.put(player.getUniqueId(), current);
+			}
+
 		}
 
-		private boolean canBypass(Player player)
+		private boolean requiresDelay(Player player, Instant current)
 		{
-			return player.hasPermission("chatdelay-bypass");
-		}
+			Instant instant = this.messageStamps.get(player.getUniqueId());
 
-		private boolean requiresDelay(Long timestamp, long currentTime)
-		{
-			return timestamp != null && (currentTime - timestamp) < ContainerChatDelay.DELAY_MILLIS;
-		}
-
-		private void sendChatDelayMessage(Player player)
-		{
-			Bukkit.getScheduler().runTask(this.plugin, () -> sendMessage(player));
-		}
-
-		private void sendMessage(Player player)
-		{
-			Text.getService().sendMessage(player, "chat-delay");
+			return instant != null && ChronoUnit.MILLIS.between(instant, current) > this.delay;
 		}
 
 	}

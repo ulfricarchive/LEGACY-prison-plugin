@@ -17,6 +17,7 @@ public class WarpContainer extends Container {
     private void setup()
     {
         this.factory.bind(Warps.class).to(WarpService.class);
+
         this.install(WarpService.class);
         this.install(WarpCommand.class);
         this.install(WarpsCommand.class);

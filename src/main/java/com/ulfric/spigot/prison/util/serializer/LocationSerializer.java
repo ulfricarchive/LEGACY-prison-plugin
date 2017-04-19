@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
 public class LocationSerializer {
@@ -12,7 +13,7 @@ public class LocationSerializer {
 
     public Location from(String context)
     {
-        String[] sections = context.split(LocationSerializer.SEPARATOR.pattern());
+        String[] sections = LocationSerializer.SEPARATOR.split(context);
 
         if (sections.length > 5)
         {
@@ -38,20 +39,16 @@ public class LocationSerializer {
 
     public String to(Location location)
     {
-        StringBuilder builder = new StringBuilder(location.getWorld().getName());
+        StringJoiner joiner = new StringJoiner(LocationSerializer.SEPARATOR.pattern());
 
-        builder.append(LocationSerializer.SEPARATOR.pattern());
-        builder.append(location.getX());
-        builder.append(LocationSerializer.SEPARATOR.pattern());
-        builder.append(location.getY());
-        builder.append(LocationSerializer.SEPARATOR.pattern());
-        builder.append(location.getZ());
-        builder.append(LocationSerializer.SEPARATOR.pattern());
-        builder.append(location.getYaw());
-        builder.append(LocationSerializer.SEPARATOR.pattern());
-        builder.append(location.getPitch());
+        joiner.add(location.getWorld().getName());
+        joiner.add(String.valueOf(location.getX()));
+        joiner.add(String.valueOf(location.getY()));
+        joiner.add(String.valueOf(location.getZ()));
+        joiner.add(String.valueOf(location.getYaw()));
+        joiner.add(String.valueOf(location.getPitch()));
 
-        return builder.toString();
+        return joiner.toString();
     }
 
 }
