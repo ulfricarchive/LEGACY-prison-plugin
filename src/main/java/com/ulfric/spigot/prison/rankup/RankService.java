@@ -66,11 +66,11 @@ public class RankService implements Ranks {
 	@Override
 	public void addRank(Rank rank)
 	{
-		Objects.requireNonNull(rank);
+		Objects.requireNonNull(rank, "rank");
 		
 		String name = rank.getName();
 		this.ranks.remove(name);
-		this.ranks.put(rank.getName(), rank);
+		this.ranks.put(name, rank);
 		
 		PersistentData data = this.folder.getData(name);
 		data.set("name", name);

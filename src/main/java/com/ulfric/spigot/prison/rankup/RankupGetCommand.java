@@ -22,11 +22,11 @@ public class RankupGetCommand extends RankupCommand {
 		Player player = (Player) context.getSender();
 		Text text = Text.getService();
 		
-		if(this.name == null)
+		if (this.name == null)
 		{
 			text.sendMessage(player, "rankup-show");
 		}
-		else if(!player.hasPermission("rankup-show-others"))
+		else if	(!player.hasPermission("rankup-show-others"))
 		{
 			text.sendMessage(player, "rankup-no-permission");
 		}
