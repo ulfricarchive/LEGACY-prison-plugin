@@ -17,9 +17,11 @@ public class RankupContainer extends Container {
 	public void setup()
 	{
 		this.factory.bind(Ranks.class).to(RankService.class);
+		this.install(RankService.class);
 		this.install(RankupCommand.class);
 		this.install(RankupGetCommand.class);
 		this.install(RankupCreateCommand.class);
+		this.install(RanksCommand.class);
 		this.install(RankPlaceholder.class);
 	}
 	

@@ -33,7 +33,7 @@ public class RankService implements Ranks {
 		this.folder = Data.getDataStore(this.owner).getDataStore("ranks");
 		
 		this.ranks.clear();
-		this.folder.loadAllData().forEach(this::loadRank);
+		this.loadRanks(this.folder.getData("ranks"));
 		
 		this.order();
 	}
@@ -48,6 +48,11 @@ public class RankService implements Ranks {
 				.build();
 		
 		this.ranks.put(rank.getName(), rank);
+	}
+	
+	private void loadRanks(PersistentData data)
+	{
+		data.getSections().forEach(this::loadRank);
 	}
 	
 	private String loadRankName(PersistentData data)
@@ -72,9 +77,9 @@ public class RankService implements Ranks {
 		this.ranks.remove(name);
 		this.ranks.put(name, rank);
 		
-		PersistentData data = this.folder.getData(name);
-		data.set("name", name);
-		data.set("price", rank.getPrice());
+		PersistentData data = this.folder.getData("ranks");
+		data.set(name + ".name", name);
+		data.set(name + ".price", rank.getPrice());
 		data.save();
 		
 		this.order();
