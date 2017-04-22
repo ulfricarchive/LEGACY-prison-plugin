@@ -33,4 +33,6 @@ public interface Ranks extends Service {
 	
 	boolean hasNextRank(Player player);
 	
+	void setRank(Player player, Rank rank);
+	
 }
