@@ -10,7 +10,7 @@ public final class Prison extends UlfricPlugin {
 	@Override
 	public void init()
 	{
-//		this.install(ContainerPerks.class);
+		this.install(ContainerPerks.class);
 		this.install(ContainerCommands.class);
 		this.install(RankupContainer.class);
 	}
