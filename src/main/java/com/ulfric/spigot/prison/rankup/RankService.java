@@ -5,8 +5,6 @@ import com.ulfric.commons.identity.Identity;
 import com.ulfric.commons.spigot.data.Data;
 import com.ulfric.commons.spigot.data.DataStore;
 import com.ulfric.commons.spigot.data.PersistentData;
-import com.ulfric.commons.spigot.metadata.Metadata;
-import com.ulfric.commons.spigot.metadata.MetadataDefaults;
 import com.ulfric.commons.spigot.permissions.PermissionEntity;
 import com.ulfric.commons.spigot.permissions.Permissions;
 import com.ulfric.dragoon.container.Container;
