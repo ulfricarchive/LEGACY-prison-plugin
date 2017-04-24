@@ -7,7 +7,6 @@ import com.ulfric.commons.spigot.command.MustBePlayer;
 import com.ulfric.commons.spigot.command.Permission;
 import com.ulfric.commons.spigot.economy.BalanceDeductionResult;
 import com.ulfric.commons.spigot.economy.BankAccount;
-import com.ulfric.commons.spigot.economy.CurrencyAmount;
 import com.ulfric.commons.spigot.economy.Economy;
 import com.ulfric.commons.spigot.text.Text;
 import org.bukkit.entity.Player;
@@ -28,11 +27,8 @@ public class RankupCommand implements Command {
 		{
 			Rank next = service.getNextRank(player);
 			
-			Economy economy = Economy.getService();
-			
-			BankAccount account = economy.getAccount(player.getUniqueId());
-			CurrencyAmount amount = CurrencyAmount.valueOf(economy.getCurrency("dollar"), next.getPrice());
-			BalanceDeductionResult result = account.deduct(amount);
+			BankAccount account = Economy.getService().getAccount(player.getUniqueId());
+			BalanceDeductionResult result = account.deduct(next.getCurrencyAmount());
 			
 			if (result.isSuccess())
 			{

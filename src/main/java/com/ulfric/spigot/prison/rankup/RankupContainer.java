@@ -20,7 +20,6 @@ public class RankupContainer extends Container {
 		this.install(RankService.class);
 		this.install(RankupCommand.class);
 		this.install(RankupGetCommand.class);
-		this.install(RankupCreateCommand.class);
 		this.install(RanksCommand.class);
 		this.install(RankPlaceholder.class);
 	}

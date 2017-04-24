@@ -5,6 +5,7 @@ import com.ulfric.commons.identity.Identity;
 import com.ulfric.commons.spigot.data.Data;
 import com.ulfric.commons.spigot.data.DataStore;
 import com.ulfric.commons.spigot.data.PersistentData;
+import com.ulfric.commons.spigot.economy.CurrencyAmount;
 import com.ulfric.commons.spigot.permissions.PermissionEntity;
 import com.ulfric.commons.spigot.permissions.Permissions;
 import com.ulfric.dragoon.container.Container;
@@ -46,21 +47,21 @@ public class RankService implements Ranks {
 		this.order();
 	}
 	
+	private void loadRanks(PersistentData data)
+	{
+		data.getSections().forEach(this::loadRank);
+	}
+	
 	private void loadRank(PersistentData data)
 	{
 		String name = this.loadRankName(data);
 		
 		Rank rank = Rank.builder()
 				.setName(name)
-				.setPrice(data.getInt("price"))
+				.setCurrencyAmount(CurrencyAmount.parseCurrencyAmount(data.getString("price")))
 				.build();
 		
 		this.ranks.put(rank.getName(), rank);
-	}
-	
-	private void loadRanks(PersistentData data)
-	{
-		data.getSections().forEach(this::loadRank);
 	}
 	
 	private String loadRankName(PersistentData data)
@@ -74,23 +75,6 @@ public class RankService implements Ranks {
 		this.orderedRanks.clear();
 		this.orderedRanks.addAll(getRanks());
 		this.orderedRanks.sort(Rank::compareTo);
-	}
-	
-	@Override
-	public void addRank(Rank rank)
-	{
-		Objects.requireNonNull(rank, "rank");
-		
-		String name = rank.getName();
-		this.ranks.remove(name);
-		this.ranks.put(name, rank);
-		
-		PersistentData data = this.folder.getData("ranks");
-		data.set(name + ".name", name);
-		data.set(name + ".price", rank.getPrice());
-		data.save();
-		
-		this.order();
 	}
 	
 	@Override

@@ -1,6 +1,7 @@
 package com.ulfric.spigot.prison.rankup;
 
 import com.ulfric.commons.bean.Bean;
+import com.ulfric.commons.spigot.economy.CurrencyAmount;
 
 import java.util.Objects;
 
@@ -14,7 +15,7 @@ public class Rank extends Bean implements Comparable<Rank> {
 	public static final class Builder implements org.apache.commons.lang3.builder.Builder<Rank>
 	{
 		private String name;
-		private long price;
+		private CurrencyAmount currencyAmount;
 	
 		Builder()
 		{
@@ -25,8 +26,9 @@ public class Rank extends Bean implements Comparable<Rank> {
 		public Rank build()
 		{
 			Objects.requireNonNull(this.name);
+			Objects.requireNonNull(this.currencyAmount);
 			
-			return new Rank(this.name, this.price);
+			return new Rank(this.name, this.currencyAmount);
 		}
 		
 		public Builder setName(String name)
@@ -35,21 +37,21 @@ public class Rank extends Bean implements Comparable<Rank> {
 			return this;
 		}
 		
-		public Builder setPrice(long price)
+		public Builder setCurrencyAmount(CurrencyAmount currencyAmount)
 		{
-			this.price = price;
+			this.currencyAmount = currencyAmount;
 			return this;
 		}
 		
 	}
 	
 	private final String name;
-	private final long price;
+	private final CurrencyAmount currencyAmount;
 	
-	Rank(String name, long price)
+	Rank(String name, CurrencyAmount currencyAmount)
 	{
 		this.name = name;
-		this.price = price;
+		this.currencyAmount = currencyAmount;
 	}
 	
 	public String getName()
@@ -57,15 +59,15 @@ public class Rank extends Bean implements Comparable<Rank> {
 		return this.name;
 	}
 	
-	public long getPrice()
+	public CurrencyAmount getCurrencyAmount()
 	{
-		return this.price;
+		return this.currencyAmount;
 	}
 	
 	@Override
-	public int compareTo(Rank o)
+	public int compareTo(Rank rank)
 	{
-		return Long.valueOf(this.price).compareTo(o.getPrice());
+		return Long.valueOf(this.currencyAmount.getAmount()).compareTo(rank.getCurrencyAmount().getAmount());
 	}
 	
 }

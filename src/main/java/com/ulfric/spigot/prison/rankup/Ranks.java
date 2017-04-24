@@ -17,8 +17,6 @@ public interface Ranks extends Service {
 		return ServiceUtils.getService(Ranks.class);
 	}
 	
-	void addRank(Rank rank);
-	
 	Rank getFirst();
 	
 	Rank getRank(String name);
