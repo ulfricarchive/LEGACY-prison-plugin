@@ -16,7 +16,7 @@ public class RankupCreateCommand extends RankupCommand
 	private String name;
 	
 	@Argument
-	private long price;
+	private Long price;
 	
 	@Override
 	public void run(Context context)
