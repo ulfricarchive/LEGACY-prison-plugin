@@ -16,6 +16,8 @@ public class ContainerCommands extends Container {
 		this.install(CommandNight.class);
 		this.install(CommandNightVision.class);
 		this.install(CommandSun.class);
+		this.install(CommandFix.class);
+		this.install(CommandFixHand.class);
 	}
 
 }
