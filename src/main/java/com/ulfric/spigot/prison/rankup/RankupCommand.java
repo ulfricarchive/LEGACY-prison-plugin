@@ -9,6 +9,7 @@ import com.ulfric.commons.spigot.economy.BalanceDeductionResult;
 import com.ulfric.commons.spigot.economy.BankAccount;
 import com.ulfric.commons.spigot.economy.Economy;
 import com.ulfric.commons.spigot.text.Text;
+import com.ulfric.spigot.prison.metadata.PrisonMetadataDefaults;
 import org.bukkit.entity.Player;
 
 @Name("rankup")
@@ -34,7 +35,7 @@ public class RankupCommand implements Command {
 			{
 				service.setRank(player, next);
 				
-				Text.getService().sendMessage(player, "rankup");
+				Text.getService().sendMessage(player, "rankup", PrisonMetadataDefaults.LAST_RANK_UP_RANK, next.getName());
 			}
 			else
 			{

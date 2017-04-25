@@ -30,8 +30,7 @@ public class RankupGetCommand extends RankupCommand {
 		if (this.player == null)
 		{
 			Rank rank = ranks.getRank(player);
-			Metadata.write(player, PrisonMetadataDefaults.LAST_RANKUP_VIEW, rank.getName());
-			text.sendMessage(player, "rankup-show");
+			text.sendMessage(player, "rankup-show", PrisonMetadataDefaults.LAST_RANK_UP_VIEW, rank.getName());
 		}
 		else if	(!player.hasPermission("rankup-show-others"))
 		{
@@ -40,9 +39,9 @@ public class RankupGetCommand extends RankupCommand {
 		else
 		{
 			Rank rank = ranks.getRank(this.player);
-			Metadata.write(player, PrisonMetadataDefaults.LAST_RANKUP_VIEW, rank.getName());
-			Metadata.write(player, PrisonMetadataDefaults.LAST_RANKUP_VIEW_USER, this.player.getName());
-			text.sendMessage(player, "rankup-show-other");
+			text.sendMessage(player, "rankup-show-other",
+					PrisonMetadataDefaults.LAST_RANK_UP_VIEW, rank.getName(),
+					PrisonMetadataDefaults.LAST_RANK_UP_VIEW_USER, this.player.getName());
 		}
 		
 	}

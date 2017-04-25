@@ -56,7 +56,7 @@ class ContainerChatDelay extends Container {
 			{
 				event.setCancelled(true);
 
-				Tasks.run(() -> Text.getService().sendMessage(player, "chat-delay"));
+				Tasks.runSync(() -> Text.getService().sendMessage(player, "chat-delay"));
 			}
 			else
 			{
