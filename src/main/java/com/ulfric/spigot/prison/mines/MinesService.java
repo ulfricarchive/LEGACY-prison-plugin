@@ -2,22 +2,24 @@ package com.ulfric.spigot.prison.mines;
 
 import com.ulfric.commons.service.Service;
 import com.ulfric.commons.spigot.chunk.ChunkUtils;
-import com.ulfric.commons.spigot.guard.Cuboid;
+import com.ulfric.commons.spigot.data.Data;
+import com.ulfric.commons.spigot.data.DataStore;
+import com.ulfric.commons.spigot.data.PersistentData;
 import com.ulfric.commons.spigot.guard.Guard;
 import com.ulfric.commons.spigot.guard.Point;
 import com.ulfric.commons.spigot.guard.Region;
-import com.ulfric.commons.spigot.guard.Shape;
 import com.ulfric.commons.spigot.plugin.PluginUtils;
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;
 import com.ulfric.dragoon.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import net.minecraft.server.v1_11_R1.Chunk;
 import net.minecraft.server.v1_11_R1.ChunkSection;
 import net.minecraft.server.v1_11_R1.IBlockData;
@@ -31,33 +33,52 @@ public class MinesService implements Service {
 	@Inject
 	private Container owner;
 
-	ExecutorService executorService = Executors.newFixedThreadPool(10);
+	ThreadPoolExecutor executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+	List<Mine> mines = new ArrayList<>();
 
 	@Initialize
 	private void initialize()
 	{
+		load();
+		for (Mine mine : mines){
+			regenerateMine(mine);
+		}
 	}
 
-	private void test()
+	private void load()
 	{
-		Bukkit.getScheduler().runTaskLater(PluginUtils.getAllPlugins().get(0), () ->
+		DataStore dataStore = Data.getDataStore(owner);
+		dataStore.loadAllData().forEach(persistentData ->
 		{
-			Point min = Point.builder().setX(0).setY(0).setZ(0).build();
-			Point max = Point.builder().setX(100).setY(256).setZ(100).build();
-			Shape shape = new Cuboid(min, max);
-			Region region = Region.builder().setName("Mine A").setBounds(shape)
-					.setWorld(Bukkit.getWorld("world").getUID()).build();
-			Guard.getService().addRegion(region);
-			ArrayList<MineBlock> mineBlocks = new ArrayList<>();
-			mineBlocks.add(new MineBlock("GOLD_BLOCK", 1000));
-			mineBlocks.add(new MineBlock("IRON_BLOCK", 1000));
-			mineBlocks.add(new MineBlock("DIAMOND_BLOCK", 1000));
-			Mine mine = new Mine(region.getName(), "Mine A", mineBlocks);
-			Bukkit.getScheduler().runTaskTimer(PluginUtils.getAllPlugins().get(0), () ->
+			String mine = persistentData.getName();
+			String region = persistentData.getString("Region");
+			List<String> blocks = persistentData.getStringList("Blocks");
+			List<MineBlock> mineBlocks = new ArrayList<>();
+			for (String block : blocks)
 			{
-				regenerateMine(mine);
-			}, 0, 1);
-		}, 200);
+				String material = block.split(":")[0];
+				int wright = Integer.parseInt(block.split(":")[1]);
+				mineBlocks.add(new MineBlock(material, wright));
+			}
+			mines.add(new Mine(region, mine, mineBlocks));
+		});
+	}
+
+	private void save()
+	{
+		DataStore dataStore = Data.getDataStore(owner);
+		for (Mine mine : mines)
+		{
+			PersistentData data = dataStore.getData(mine.mine);
+			data.set("Region", mine.region);
+			List<String> blocks = new ArrayList<>();
+			for (MineBlock mineBlock : mine.mineBlocks)
+			{
+				blocks.add(mineBlock.material + ":" + mineBlock.weight);
+			}
+			data.set("Blocks", blocks);
+			data.save();
+		}
 	}
 
 	public void regenerateMine(Mine mine)
@@ -102,8 +123,18 @@ public class MinesService implements Service {
 				});
 			}
 		}
-		Bukkit.getScheduler().scheduleSyncDelayedTask(PluginUtils.getMainPlugin(), () ->
+		Bukkit.getScheduler().runTaskAsynchronously(PluginUtils.getMainPlugin(), () ->
 		{
+			while (executorService.getActiveCount() > 0)
+			{
+				try
+				{
+					Thread.sleep(10);
+				} catch (InterruptedException e)
+				{
+					e.printStackTrace();
+				}
+			}
 			for (Entry<ChunkCords, ChunkSection[]> entry : chunks.entrySet())
 			{
 				Chunk chunk = world.getChunkAt(entry.getKey().x, entry.getKey().z);

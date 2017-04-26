@@ -15,7 +15,7 @@ public class Mine {
 	int totalWright = 0;
 
 	public Mine(String region, String mine,
-			ArrayList<MineBlock> mineBlocks)
+			List<MineBlock> mineBlocks)
 	{
 		this.region = region;
 		this.mine = mine;
@@ -66,6 +66,5 @@ public class Mine {
 			this.max = max;
 		}
 	}
-
 
 }
