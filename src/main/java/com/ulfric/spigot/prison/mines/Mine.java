@@ -2,6 +2,7 @@ package com.ulfric.spigot.prison.mines;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -9,8 +10,8 @@ public class Mine {
 
 	String region;
 	String mine;
-	ArrayList<MineBlock> mineBlocks = new ArrayList<>();
-	HashMap<MineBlock, Bounds> blockWeights = new HashMap<>();
+	List<MineBlock> mineBlocks = new ArrayList<>();
+	Map<MineBlock, Bounds> blockWeights = new HashMap<>();
 	int totalWright = 0;
 
 	public Mine(String region, String mine,

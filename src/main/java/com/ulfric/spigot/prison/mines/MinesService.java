@@ -13,6 +13,7 @@ import com.ulfric.dragoon.initialize.Initialize;
 import com.ulfric.dragoon.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -62,7 +63,7 @@ public class MinesService implements Service {
 	public void regenerateMine(Mine mine)
 	{
 		long start = System.currentTimeMillis();
-		HashMap<ChunkCords, ChunkSection[]> chunks = new HashMap<>();
+		Map<ChunkCords, ChunkSection[]> chunks = new HashMap<>();
 		Region region = Guard.getService().getRegion(mine.region);
 		Objects.requireNonNull(region, "Region is null");
 		Point min = region.getBounds().getMin();
