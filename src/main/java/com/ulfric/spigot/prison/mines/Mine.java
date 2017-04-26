@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 public class Mine {
 
@@ -36,15 +35,16 @@ public class Mine {
 			{
 				bounds = new Bounds(lastBounds.max, lastBounds.max + mineBlock.weight);
 			}
-			blockWeights.put(mineBlock,bounds);
+			blockWeights.put(mineBlock, bounds);
 			lastBounds = bounds;
 		}
 		totalWright = lastBounds == null ? 0 : lastBounds.max;
 	}
 
+	XORShiftRandom xorShiftRandom = new XORShiftRandom();
 	public MineBlock getNextBLock()
 	{
-		int roll = new Random().nextInt(totalWright);
+		int roll = xorShiftRandom.nextInt(totalWright);
 		for (Map.Entry<MineBlock, Bounds> entry : blockWeights.entrySet())
 		{
 			if (roll >= entry.getValue().min && roll <= entry.getValue().max)
@@ -65,6 +65,28 @@ public class Mine {
 			this.min = min;
 			this.max = max;
 		}
+	}
+
+	public class XORShiftRandom {
+
+		private long last;
+
+		public XORShiftRandom() {
+			this(System.currentTimeMillis());
+		}
+
+		public XORShiftRandom(long seed) {
+			this.last = seed;
+		}
+
+		public int nextInt(int max) {
+			last ^= (last << 21);
+			last ^= (last >>> 35);
+			last ^= (last << 4);
+			int out = (int) last % max;
+			return (out < 0) ? -out : out;
+		}
+
 	}
 
 }

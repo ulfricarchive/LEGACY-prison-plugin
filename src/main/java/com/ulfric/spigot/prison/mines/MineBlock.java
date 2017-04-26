@@ -34,4 +34,5 @@ public class MineBlock {
 	{
 		return material != null ? material.hashCode() : 0;
 	}
+
 }

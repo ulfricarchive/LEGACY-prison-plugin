@@ -30,19 +30,23 @@ import org.bukkit.craftbukkit.v1_11_R1.CraftWorld;
 
 public class MinesService implements Service {
 
+	List<Mine> mines = new ArrayList<>();
+	ThreadPoolExecutor executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(30);
+
 	@Inject
 	private Container owner;
-
-	ThreadPoolExecutor executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
-	List<Mine> mines = new ArrayList<>();
 
 	@Initialize
 	private void initialize()
 	{
 		load();
-		for (Mine mine : mines){
-			regenerateMine(mine);
-		}
+		Bukkit.getScheduler().runTaskTimer(PluginUtils.getMainPlugin(), () ->
+		{
+			for (Mine mine : mines)
+			{
+				regenerateMine(mine);
+			}
+		}, 0, 4);
 	}
 
 	private void load()
@@ -84,12 +88,51 @@ public class MinesService implements Service {
 	public void regenerateMine(Mine mine)
 	{
 		long start = System.currentTimeMillis();
-		Map<ChunkCords, ChunkSection[]> chunks = new HashMap<>();
 		Region region = Guard.getService().getRegion(mine.region);
 		Objects.requireNonNull(region, "Region is null");
 		Point min = region.getBounds().getMin();
 		Point max = region.getBounds().getMax();
 		World world = ((CraftWorld) Bukkit.getWorld(region.getWorld())).getHandle();
+		Map<ChunkCords, ChunkSection[]> chunks = getChunks(world, min, max);
+		executorService.submit(() ->
+		{
+			for (int x = min.getX(); x <= max.getX(); x++)
+			{
+				for (int z = min.getZ(); z <= max.getZ(); z++)
+				{
+					ChunkSection[] sections = chunks.get(new ChunkCords(x >> 4, z >> 4));
+					for (int y = min.getY(); y <= max.getY() && y < 256; y++)
+					{
+						MineBlock mineBlock = mine.getNextBLock();
+						Objects.requireNonNull(mineBlock, "mineBLock is null");
+						IBlockData iBlockData = ChunkUtils
+								.nmsBlock(Material.getMaterial(mineBlock.material), (byte) 0);
+						if (sections[y >> 4] == null)
+						{
+							sections[y >> 4] = new ChunkSection(y >> 4 << 4, true);
+						}
+						sections[y >> 4].setType(x & 15, y & 15, z & 15, iBlockData);
+					}
+				}
+			}
+			Bukkit.getScheduler().runTask(PluginUtils.getMainPlugin(), () ->
+			{
+				for (Entry<ChunkCords, ChunkSection[]> entry : chunks.entrySet())
+				{
+					Chunk chunk = world.getChunkAt(entry.getKey().x, entry.getKey().z);
+					chunk.initLighting();
+					ChunkUtils.applyChanges(chunk, entry.getValue());
+				}
+				System.out.println(
+						"Resenting Mine: " + mine.mine + " --- " + (System.currentTimeMillis() - start)
+								+ "ms");
+			});
+		});
+	}
+
+	private Map<ChunkCords, ChunkSection[]> getChunks(World world, Point min, Point max)
+	{
+		Map<ChunkCords, ChunkSection[]> chunks = new HashMap<>();
 		for (int x = min.getX(); x <= max.getX(); x++)
 		{
 			for (int z = min.getZ(); z <= max.getZ(); z++)
@@ -102,54 +145,24 @@ public class MinesService implements Service {
 				} else
 				{
 					sections = world.getChunkAt(cords.x, cords.z).getSections();
-					chunks.put(cords, sections);
 				}
-				int finalX = x;
-				int finalZ = z;
-				executorService.submit(() ->
-				{
-					for (int y = min.getY(); y <= max.getY() && y < 256; y++)
-					{
-						MineBlock mineBlock = mine.getNextBLock();
-						Objects.requireNonNull(mineBlock, "mineBLock is null");
-						IBlockData iBlockData = ChunkUtils
-								.nmsBlock(Material.getMaterial(mineBlock.material), (byte) 0);
-						if (sections[y >> 4] == null)
-						{
-							sections[y >> 4] = new ChunkSection(y >> 4 << 4, true);
-						}
-						sections[y >> 4].setType(finalX & 15, y & 15, finalZ & 15, iBlockData);
-					}
-				});
+				chunks.put(cords, sections);
 			}
 		}
-		Bukkit.getScheduler().runTaskAsynchronously(PluginUtils.getMainPlugin(), () ->
-		{
-			while (executorService.getActiveCount() > 0)
-			{
-				try
-				{
-					Thread.sleep(10);
-				} catch (InterruptedException e)
-				{
-					e.printStackTrace();
-				}
-			}
-			for (Entry<ChunkCords, ChunkSection[]> entry : chunks.entrySet())
-			{
-				Chunk chunk = world.getChunkAt(entry.getKey().x, entry.getKey().z);
-				chunk.initLighting();
-				ChunkUtils.applyChanges(chunk, entry.getValue());
-			}
-			System.out.println(
-					"Resenting Mine: " + mine.mine + " --- " + (System.currentTimeMillis() - start) + "ms");
-		});
+		return chunks;
 	}
 
 	private class ChunkCords {
 
 		int x;
 		int z;
+
+		public ChunkCords(int x, int z)
+		{
+
+			this.x = x;
+			this.z = z;
+		}
 
 		@Override
 		public boolean equals(Object o)
@@ -179,13 +192,6 @@ public class MinesService implements Service {
 			int result = x;
 			result = 31 * result + z;
 			return result;
-		}
-
-		public ChunkCords(int x, int z)
-		{
-
-			this.x = x;
-			this.z = z;
 		}
 	}
 }
