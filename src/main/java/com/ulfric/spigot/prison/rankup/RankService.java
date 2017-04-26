@@ -37,7 +37,7 @@ public class RankService implements Ranks {
 	private final Map<UUID, Rank> userRanks = new ConcurrentHashMap<>();
 	
 	@Initialize
-	public void initialize()
+	private void initialize()
 	{
 		this.folder = Data.getDataStore(this.owner).getDataStore("ranks");
 		

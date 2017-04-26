@@ -3,10 +3,10 @@ package com.ulfric.spigot.prison.command;
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;
 
-public class ContainerCommands extends Container {
+public class EssentialCommandsContainer extends Container {
 
 	@Initialize
-	public void setup()
+	private void initialize()
 	{
 		this.install(CommandFeed.class);
 		this.install(CommandCraft.class);

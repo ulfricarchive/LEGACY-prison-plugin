@@ -13,8 +13,6 @@ import org.bukkit.inventory.ItemStack;
 @MustBePlayer
 public class CommandFixHand extends CommandFix {
 	
-	private static final long COOLDOWN_IN_MILLISECONDS = 300000;
-	
 	@Override
 	public void run(Context context)
 	{
@@ -34,5 +32,5 @@ public class CommandFixHand extends CommandFix {
 		
 		Text.getService().sendMessage(player, "fix-use-hand");
 	}
-	
+
 }

@@ -14,7 +14,7 @@ public class RankupContainer extends Container {
 	private RankService ranks;
 	
 	@Initialize
-	public void setup()
+	private void initialize()
 	{
 		this.factory.bind(Ranks.class).to(RankService.class);
 		this.install(RankService.class);

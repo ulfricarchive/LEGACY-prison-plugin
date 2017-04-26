@@ -7,10 +7,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
-public class ContainerDeathExperience extends Container {
+public class DeathExperienceContainer extends Container {
 
     @Initialize
-    public void setup()
+    private void initialize()
     {
         this.install(DeathExperienceListener.class);
     }

@@ -19,10 +19,10 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;
 
-class ContainerChatDelay extends Container {
+class ChatDelayContainer extends Container {
 
 	@Initialize
-	public void setup()
+	private void initialize()
 	{
 		this.install(ChatListener.class);
 	}
@@ -37,7 +37,7 @@ class ContainerChatDelay extends Container {
 		private final Map<UUID, Instant> messageStamps = new ConcurrentHashMap<>();
 
 		@Initialize
-		public void setup()
+		private void initialize()
 		{
 			DataStore dataStore = Data.getDataStore(this.owner).getDataStore("chat-delay");
 

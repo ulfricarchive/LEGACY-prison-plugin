@@ -8,17 +8,16 @@ import com.ulfric.commons.spigot.intercept.RequirePermission;
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;
 
-class ContainerJoinWhenFull extends Container {
+class JoinWhenFullContainer extends Container {
 
 	@Initialize
-	public void setup()
+	private void initialize()
 	{
 		this.install(JoinListener.class);
 	}
 
 	private static class JoinListener implements Listener
 	{
-
 		@EventHandler
 		@RequirePermission(permission = "maxjoin-bypass")
 		public void on(PlayerLoginEvent event)
@@ -38,7 +37,6 @@ class ContainerJoinWhenFull extends Container {
 		{
 			event.setResult(PlayerLoginEvent.Result.ALLOWED);
 		}
-
 	}
 
 }

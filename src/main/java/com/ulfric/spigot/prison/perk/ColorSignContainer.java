@@ -12,10 +12,10 @@ import com.ulfric.commons.spigot.intercept.RequirePermission;
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;
 
-class ContainerColorSign extends Container {
+class ColorSignContainer extends Container {
 
 	@Initialize
-	public void setup()
+	private void initialize()
 	{
 		this.install(SignListener.class);
 	}
