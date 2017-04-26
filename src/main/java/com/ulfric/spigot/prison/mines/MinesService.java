@@ -40,13 +40,13 @@ public class MinesService implements Service {
 	private void initialize()
 	{
 		load();
-		Bukkit.getScheduler().runTaskTimer(PluginUtils.getMainPlugin(), () ->
-		{
-			for (Mine mine : mines)
-			{
-				regenerateMine(mine);
-			}
-		}, 0, 4);
+		autoRegen();
+	}
+
+	private void autoRegen()
+	{
+		//come up with some auto regen method
+		//maybe every 5 mins
 	}
 
 	private void load()
