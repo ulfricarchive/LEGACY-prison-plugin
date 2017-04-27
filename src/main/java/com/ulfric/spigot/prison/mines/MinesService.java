@@ -3,7 +3,6 @@ package com.ulfric.spigot.prison.mines;
 import com.ulfric.commons.spigot.chunk.ChunkUtils;
 import com.ulfric.commons.spigot.data.Data;
 import com.ulfric.commons.spigot.data.DataStore;
-import com.ulfric.commons.spigot.data.PersistentData;
 import com.ulfric.commons.spigot.guard.Guard;
 import com.ulfric.commons.spigot.guard.Point;
 import com.ulfric.commons.spigot.guard.Region;
@@ -71,22 +70,6 @@ public final class MinesService implements Mines {
 					.build();
 			
 			this.mines.add(mine);
-		});
-	}
-
-	private void save()
-	{
-		this.getMines().forEach(mine ->
-		{
-			PersistentData data = this.folder.getData(mine.getMine());
-			
-			data.set("Region", mine.getRegion());
-			
-			List<String> blocks = new ArrayList<>();
-			mine.getMineBlocks().map(MineBlock::toString).forEach(blocks::add);
-			data.set("Blocks", blocks);
-			
-			data.save();
 		});
 	}
 	

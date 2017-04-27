@@ -6,7 +6,6 @@ import com.ulfric.commons.spigot.command.Context;
 import com.ulfric.commons.spigot.command.MustBePlayer;
 import com.ulfric.commons.spigot.command.Permission;
 import com.ulfric.commons.spigot.command.argument.Argument;
-import com.ulfric.commons.spigot.metadata.Metadata;
 import com.ulfric.commons.spigot.text.Text;
 import com.ulfric.spigot.prison.metadata.PrisonMetadataDefaults;
 import org.bukkit.entity.Player;
