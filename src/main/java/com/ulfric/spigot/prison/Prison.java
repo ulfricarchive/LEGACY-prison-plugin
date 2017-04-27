@@ -5,6 +5,7 @@ import com.ulfric.spigot.prison.command.EssentialCommandsContainer;
 import com.ulfric.spigot.prison.mines.MinesContainer;
 import com.ulfric.spigot.prison.perk.PerksContainer;
 import com.ulfric.spigot.prison.rankup.RankupContainer;
+import com.ulfric.spigot.prison.spawner.SpawnersContainer;
 
 public final class Prison extends UlfricPlugin {
 
@@ -15,6 +16,7 @@ public final class Prison extends UlfricPlugin {
 		this.install(EssentialCommandsContainer.class);
 		this.install(RankupContainer.class);
 		this.install(MinesContainer.class);
+		this.install(SpawnersContainer.class);
 	}
 
 }
