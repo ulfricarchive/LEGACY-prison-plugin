@@ -1,5 +1,6 @@
 package com.ulfric.spigot.prison.mines;
 
+import com.google.gson.GsonBuilder;
 import com.ulfric.commons.spigot.chunk.ChunkUtils;
 import com.ulfric.commons.spigot.data.Data;
 import com.ulfric.commons.spigot.data.DataStore;
@@ -19,7 +20,6 @@ import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Stream;
-
 import net.minecraft.server.v1_11_R1.Chunk;
 import net.minecraft.server.v1_11_R1.ChunkSection;
 import net.minecraft.server.v1_11_R1.IBlockData;
@@ -31,15 +31,14 @@ import org.bukkit.plugin.Plugin;
 
 public final class MinesService implements Mines {
 
+	private final List<Mine> mines = new ArrayList<>();
+	private final ThreadPoolExecutor executorService = (ThreadPoolExecutor) Executors
+			.newFixedThreadPool(30);
+	private final Plugin plugin = PluginUtils.getMainPlugin();
 	@Inject
 	private Container owner;
-	
-	private final List<Mine> mines = new ArrayList<>();
-	private final ThreadPoolExecutor executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(30);
-	private final Plugin plugin = PluginUtils.getMainPlugin();
-	
 	private DataStore folder;
-	
+
 	@Initialize
 	private void initialize()
 	{
@@ -55,76 +54,81 @@ public final class MinesService implements Mines {
 			String name = persistentData.getName();
 			String region = persistentData.getString("Region");
 			List<MineBlock> mineBlocks = new ArrayList<>();
-			
+
 			persistentData.getStringList("Blocks").forEach(block ->
 			{
 				String material = block.split(":")[0];
 				int wright = Integer.parseInt(block.split(":")[1]);
 				mineBlocks.add(new MineBlock(material, wright));
 			});
-			
+
 			Mine mine = Mine.builder()
 					.setMine(name)
 					.setRegion(region)
 					.setMineBlocks(mineBlocks)
 					.build();
-			
+
 			this.mines.add(mine);
+			System.out.println("Loaded mine: " + mine.getMine());
+			System.out
+					.println(new GsonBuilder().setPrettyPrinting().create().toJson(mine.getDropTable()));
 		});
 	}
-	
+
 	private void autoRegen()
 	{
-		Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> this.getMines().forEach(this::regenerate), 0, 1);
+		Bukkit.getScheduler()
+				.runTaskTimerAsynchronously(plugin, () -> this.getMines().forEach(this::regenerate), 0,
+						1);
 	}
 
 	@Override
 	public void regenerate(Mine mine)
 	{
 		long start = System.currentTimeMillis();
-		
+
 		Region region = Guard.getService().getRegion(mine.getRegion());
 		Objects.requireNonNull(region, "Region is null");
-		
+
 		Point min = region.getBounds().getMin();
 		Point max = region.getBounds().getMax();
-		
+
 		Bukkit.getScheduler().runTask(this.plugin, () ->
 		{
 			World world = ((CraftWorld) Bukkit.getWorld(region.getWorld())).getHandle();
 			Map<ChunkCords, ChunkSection[]> chunks = getChunks(world, min, max);
-			
+
 			this.executorService.submit(() ->
 			{
 				for (int x = min.getX(); x <= max.getX(); x++)
 				{
-					
+
 					for (int z = min.getZ(); z <= max.getZ(); z++)
 					{
-						
+
 						ChunkSection[] sections = chunks.get(new ChunkCords(x >> 4, z >> 4));
-						
+
 						for (int y = min.getY(); y <= max.getY() && y < 256; y++)
 						{
-							
+
 							MineBlock mineBlock = mine.getNextBLock();
 							Objects.requireNonNull(mineBlock, "MineBlock is null");
-							
+
 							IBlockData iBlockData = ChunkUtils
 									.nmsBlock(Material.getMaterial(mineBlock.getMaterial()), (byte) 0);
-							
+
 							if (sections[y >> 4] == null)
 							{
 								sections[y >> 4] = new ChunkSection(y >> 4 << 4, true);
 							}
-							
+
 							sections[y >> 4].setType(x & 15, y & 15, z & 15, iBlockData);
 						}
-						
+
 					}
-					
+
 				}
-				
+
 				Bukkit.getScheduler().runTask(this.plugin, () ->
 				{
 					for (Entry<ChunkCords, ChunkSection[]> entry : chunks.entrySet())
@@ -136,18 +140,18 @@ public final class MinesService implements Mines {
 							"Resenting Mine: " + mine.getMine() + " --- " + (System.currentTimeMillis() - start)
 									+ "ms");
 				});
-				
+
 			});
-			
+
 		});
 	}
-	
+
 	@Override
 	public Stream<Mine> getMines()
 	{
 		return new ArrayList<>(this.mines).stream();
 	}
-	
+
 	private Map<ChunkCords, ChunkSection[]> getChunks(World world, Point min, Point max)
 	{
 		Map<ChunkCords, ChunkSection[]> chunks = new HashMap<>();
@@ -160,7 +164,8 @@ public final class MinesService implements Mines {
 				if (chunks.containsKey(cords))
 				{
 					sections = chunks.get(cords);
-				} else
+				}
+				else
 				{
 					sections = world.getChunkAt(cords.x, cords.z).getSections();
 				}
@@ -189,15 +194,15 @@ public final class MinesService implements Mines {
 			{
 				return true;
 			}
-			
+
 			if (o == null || getClass() != o.getClass())
 			{
 				return false;
 			}
 
 			ChunkCords that = (ChunkCords) o;
-			
-			return this.x == that.x &&  this.z == that.z;
+
+			return this.x == that.x && this.z == that.z;
 		}
 
 		@Override
@@ -207,7 +212,7 @@ public final class MinesService implements Mines {
 			result = 31 * result + z;
 			return result;
 		}
-		
+
 	}
-	
+
 }

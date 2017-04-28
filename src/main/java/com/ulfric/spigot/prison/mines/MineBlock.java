@@ -15,18 +15,18 @@ public class MineBlock {
 	{
 		return this.material;
 	}
-	
+
 	public int getWeight()
 	{
 		return this.weight;
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return new StringBuilder(this.material).append(":").append(this.weight).toString();
 	}
-	
+
 	@Override
 	public boolean equals(Object o)
 	{
