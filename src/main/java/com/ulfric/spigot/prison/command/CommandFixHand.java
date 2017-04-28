@@ -19,6 +19,8 @@ import java.time.Instant;
 @MustBePlayer
 public class CommandFixHand extends CommandFix {
 	
+	private static final String COOLDOWN_NAME = "COMMAND_FIX_HAND";
+	
 	@Override
 	public void run(Context context)
 	{
@@ -34,9 +36,9 @@ public class CommandFixHand extends CommandFix {
 		
 		CooldownAccount account = Cooldowns.getService().getAccount(player.getUniqueId());
 		
-		if (account.isCooldown(this.getClass()))
+		if (account.isCooldown(CommandFixHand.COOLDOWN_NAME))
 		{
-			Cooldown cooldown = account.getCooldown(this.getClass());
+			Cooldown cooldown = account.getCooldown(CommandFixHand.COOLDOWN_NAME);
 			Instant remaining = cooldown.getRemaining();
 			Text.getService().sendMessage(player, "fix-hand-cooldown", PrisonMetadataDefaults.LAST_FIX_HAND_COOLDOWN, this.format(remaining));
 			return;
@@ -44,7 +46,7 @@ public class CommandFixHand extends CommandFix {
 		
 		Cooldown cooldown = Cooldown.builder()
 				.setUniqueId(player.getUniqueId())
-				.setOwner(this.getClass())
+				.setName(CommandFixHand.COOLDOWN_NAME)
 				.setStart(Instant.now())
 				.setExpiry(this.getExpiry())
 				.build();

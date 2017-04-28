@@ -20,6 +20,8 @@ import java.time.Instant;
 @MustBePlayer
 public class CommandFixAll extends CommandFix {
 	
+	private static final String COOLDOWN_NAME = "COMMAND_FIX_ALL";
+	
 	@Override
 	public void run(Context context)
 	{
@@ -27,9 +29,9 @@ public class CommandFixAll extends CommandFix {
 		
 		CooldownAccount account = Cooldowns.getService().getAccount(player.getUniqueId());
 		
-		if (account.isCooldown(this.getClass()))
+		if (account.isCooldown(CommandFixAll.COOLDOWN_NAME))
 		{
-			Cooldown cooldown = account.getCooldown(this.getClass());
+			Cooldown cooldown = account.getCooldown(CommandFixAll.COOLDOWN_NAME);
 			Instant remaining = cooldown.getRemaining();
 			Text.getService().sendMessage(player, "fix-all-cooldown", PrisonMetadataDefaults.LAST_FIX_ALL_COOLDOWN, this.format(remaining));
 			return;
@@ -43,7 +45,7 @@ public class CommandFixAll extends CommandFix {
 			
 			Cooldown cooldown = Cooldown.builder()
 					.setUniqueId(player.getUniqueId())
-					.setOwner(this.getClass())
+					.setName(CommandFixAll.COOLDOWN_NAME)
 					.setStart(Instant.now())
 					.setExpiry(this.getExpiry())
 					.build();

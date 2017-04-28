@@ -30,7 +30,7 @@ public class CommandFix implements Command {
 	
 	final String format(Instant instant)
 	{
-		long milliseconds = instant.getLong(ChronoField.MILLI_OF_SECOND);
+		long milliseconds = instant.toEpochMilli();
 		long days = TimeUnit.MILLISECONDS.toDays(milliseconds) % 31;
 		long hours = TimeUnit.MILLISECONDS.toHours(milliseconds) % 24;
 		
