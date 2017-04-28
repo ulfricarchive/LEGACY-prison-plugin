@@ -10,27 +10,20 @@ import com.ulfric.commons.spigot.cooldown.Cooldowns;
 import com.ulfric.commons.spigot.text.Text;
 import com.ulfric.spigot.prison.metadata.PrisonMetadataDefaults;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.time.Instant;
 
-@Name("hand")
-@Permission("fix-hand-use")
+@Name("all")
+@Permission("fix-all-use")
 @MustBePlayer
-public class CommandFixHand extends CommandFix {
+public class CommandFixAll extends CommandFix {
 	
 	@Override
 	public void run(Context context)
 	{
 		Player player = (Player) context.getSender();
-		
-		ItemStack itemStack = player.getEquipment().getItemInMainHand();
-		
-		if (!this.isFixable(itemStack))
-		{
-			Text.getService().sendMessage(player, "fix-invalid-item");
-			return;
-		}
 		
 		CooldownAccount account = Cooldowns.getService().getAccount(player.getUniqueId());
 		
@@ -38,23 +31,48 @@ public class CommandFixHand extends CommandFix {
 		{
 			Cooldown cooldown = account.getCooldown(this.getClass());
 			Instant remaining = cooldown.getRemaining();
-			Text.getService().sendMessage(player, "fix-hand-cooldown", PrisonMetadataDefaults.LAST_FIX_HAND_COOLDOWN, this.format(remaining));
+			Text.getService().sendMessage(player, "fix-all-cooldown", PrisonMetadataDefaults.LAST_FIX_ALL_COOLDOWN, this.format(remaining));
 			return;
 		}
 		
-		Cooldown cooldown = Cooldown.builder()
-				.setUniqueId(player.getUniqueId())
-				.setOwner(this.getClass())
-				.setStart(Instant.now())
-				.setExpiry(this.getExpiry())
-				.build();
+		boolean repaired = this.repair(player.getInventory());
 		
-		account.setCooldown(cooldown);
+		if (repaired)
+		{
+			player.updateInventory();
+			
+			Cooldown cooldown = Cooldown.builder()
+					.setUniqueId(player.getUniqueId())
+					.setOwner(this.getClass())
+					.setStart(Instant.now())
+					.setExpiry(this.getExpiry())
+					.build();
+			
+			account.setCooldown(cooldown);
+			
+			Text.getService().sendMessage(player, "fix-all");
+		}
+		else
+		{
+			Text.getService().sendMessage(player, "fix-all-invalid-items");
+		}
 		
-		itemStack.setDurability((short) 0);
-		player.updateInventory();
+	}
+	
+	private boolean repair(Inventory inventory)
+	{
+		boolean repaired = false;
 		
-		Text.getService().sendMessage(player, "fix-hand");
+		for (ItemStack itemStack : inventory.getContents())
+		{
+			if (this.isFixable(itemStack))
+			{
+				itemStack.setDurability((short) 0);
+				repaired = true;
+			}
+		}
+		
+		return repaired;
 	}
 	
 	private Instant getExpiry()
@@ -62,5 +80,5 @@ public class CommandFixHand extends CommandFix {
 		// todo: need to talk to packet
 		return Instant.now();
 	}
-
+	
 }

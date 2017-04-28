@@ -8,6 +8,10 @@ import com.ulfric.commons.spigot.command.Permission;
 import com.ulfric.commons.spigot.text.Text;
 import org.bukkit.inventory.ItemStack;
 
+import java.time.Instant;
+import java.time.temporal.ChronoField;
+import java.util.concurrent.TimeUnit;
+
 @Name("fix")
 @Permission("fix-use")
 @MustBePlayer
@@ -22,6 +26,29 @@ public class CommandFix implements Command {
 	final boolean isFixable(ItemStack itemStack)
 	{
 		return itemStack != null && itemStack.getDurability() != 0;
+	}
+	
+	final String format(Instant instant)
+	{
+		long milliseconds = instant.getLong(ChronoField.MILLI_OF_SECOND);
+		long days = TimeUnit.MILLISECONDS.toDays(milliseconds) % 31;
+		long hours = TimeUnit.MILLISECONDS.toHours(milliseconds) % 24;
+		
+		StringBuilder builder = new StringBuilder();
+		
+		if (days > 0)
+		{
+			builder.append(String.valueOf(days)).append("d ");
+		}
+		
+		if (hours > 0)
+		{
+			builder.append(String.valueOf(hours)).append("h ");
+		}
+		
+		builder.append(String.valueOf(TimeUnit.MILLISECONDS.toMinutes(milliseconds) % 60)).append("m ");
+		builder.append(String.valueOf(TimeUnit.MILLISECONDS.toSeconds(milliseconds) % 60)).append("s");
+		return builder.toString();
 	}
 	
 }
