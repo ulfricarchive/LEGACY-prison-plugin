@@ -8,6 +8,7 @@ public class PrisonMetadataDefaults {
 	public static final String LAST_SPAWNER_TYPE = "LastSpawnerType";
 	public static final String LAST_FIX_HAND_COOLDOWN = "LastFixHandCooldown";
 	public static final String LAST_FIX_ALL_COOLDOWN = "LastFixAllCooldown";
+	public static final String LAST_BLOCKS_QUANTITY = "LastBlocksQuantity";
 
 	private PrisonMetadataDefaults()
 	{
