@@ -5,6 +5,7 @@ import com.ulfric.commons.spigot.command.Command;
 import com.ulfric.commons.spigot.command.Context;
 import com.ulfric.commons.spigot.command.MustBePlayer;
 import com.ulfric.commons.spigot.command.Permission;
+import com.ulfric.commons.spigot.item.MaterialType;
 import com.ulfric.commons.spigot.text.Text;
 import com.ulfric.spigot.prison.metadata.PrisonMetadataDefaults;
 import org.bukkit.Material;
@@ -32,15 +33,18 @@ public class CommandBlocks implements Command {
 		
 		collector.forEach((translation, integer) ->
 		{
-			int blocks = (int) Math.floor(integer / 9D);
+			Item from = translation.getFrom();
 			
-			this.take(player, new ItemStack(translation.getFrom()), integer * 9);
-			this.give(player, new ItemStack(translation.getTo()), blocks);
+			int blocks = (int) Math.floor(integer / from.getQuantity());
+			
+			this.take(player, new ItemStack(from.getMaterial().getType(), 1, from.getMaterial().getData()), integer * from.getQuantity());
+			this.give(player, new ItemStack(translation.getTo().getType(), 1, translation.getTo().getData()), blocks);
 		});
 		
 		player.updateInventory();
 		
-		Text.getService().sendMessage(player, "blocks-use", PrisonMetadataDefaults.LAST_BLOCKS_QUANTITY, String.valueOf(collector.values().stream().mapToInt(Integer::intValue).sum()));
+		Text.getService().sendMessage(player, "blocks-use", PrisonMetadataDefaults.LAST_BLOCKS_QUANTITY,
+				String.valueOf(collector.values().stream().mapToInt(Integer::intValue).sum()));
 	}
 	
 	private void give(Player player, ItemStack item, int amount)
@@ -109,12 +113,17 @@ public class CommandBlocks implements Command {
 	
 	private enum Translation {
 		
-		COAL(Material.COAL, Material.COAL_BLOCK),
-		IRON(Material.IRON_INGOT, Material.IRON_BLOCK),
-		GOLD(Material.GOLD_INGOT, Material.GOLD_BLOCK),
-		DIAMOND(Material.DIAMOND, Material.DIAMOND_BLOCK),
-		EMERALD(Material.EMERALD, Material.EMERALD_BLOCK),
-		REDSTONE(Material.REDSTONE, Material.REDSTONE_BLOCK);
+		COAL(new Item(MaterialType.getType(Material.COAL), 9), MaterialType.getType(Material.COAL_BLOCK)),
+		IRON(new Item(MaterialType.getType(Material.IRON_INGOT), 9), MaterialType.getType(Material.IRON_BLOCK)),
+		GOLD(new Item(MaterialType.getType(Material.GOLD_INGOT), 9), MaterialType.getType(Material.GOLD_BLOCK)),
+		DIAMOND(new Item(MaterialType.getType(Material.DIAMOND), 9), MaterialType.getType(Material.DIAMOND_BLOCK)),
+		EMERALD(new Item(MaterialType.getType(Material.EMERALD), 9), MaterialType.getType(Material.EMERALD_BLOCK)),
+		REDSTONE(new Item(MaterialType.getType(Material.REDSTONE), 9), MaterialType.getType(Material.REDSTONE_BLOCK)),
+		QUARTZ(new Item(MaterialType.getType(Material.QUARTZ), 4), MaterialType.getType(Material.QUARTZ_BLOCK)),
+		WHEAT(new Item(MaterialType.getType(Material.WHEAT), 9), MaterialType.getType(Material.HAY_BLOCK)),
+		LAPIS(new Item(MaterialType.getType(Material.INK_SACK, (byte) 4), 9), MaterialType.getType(Material.LAPIS_BLOCK))
+		
+		;
 		
 		private static final Map<Material, Translation> ORIGINS = new EnumMap<>(Material.class);
 		
@@ -122,32 +131,32 @@ public class CommandBlocks implements Command {
 		{
 			for (Translation translation : values())
 			{
-				Translation.ORIGINS.put(translation.getFrom(), translation);
+				Translation.ORIGINS.put(translation.getFrom().getMaterial().getType(), translation);
 			}
 		}
 		
-		private final Material from;
-		private final Material to;
+		private final Item from;
+		private final MaterialType to;
 		
-		Translation(Material from, Material to)
+		Translation(Item from, MaterialType to)
 		{
 			this.from = from;
 			this.to = to;
 		}
 		
-		public Material getFrom()
+		public Item getFrom()
 		{
 			return this.from;
 		}
 		
-		public Material getTo()
+		public MaterialType getTo()
 		{
 			return this.to;
 		}
 		
 		public String getPermission()
 		{
-			return "blocks-use-" + this.from.name().toLowerCase();
+			return "blocks-use-" + this.from.getMaterial().getType().name().toLowerCase();
 		}
 		
 		public static Translation fromOrigin(Material material)
@@ -155,6 +164,34 @@ public class CommandBlocks implements Command {
 			Objects.requireNonNull(material);
 			
 			return Translation.ORIGINS.get(material);
+		}
+		
+	}
+	
+	private static final class Item {
+		
+		private final MaterialType materialType;
+		private final int quantity;
+		
+		Item(MaterialType materialType, int quantity)
+		{
+			this.materialType = materialType;
+			this.quantity = quantity;
+		}
+		
+		Item(MaterialType materialType)
+		{
+			this(materialType, 1);
+		}
+		
+		public MaterialType getMaterial()
+		{
+			return this.materialType;
+		}
+		
+		public int getQuantity()
+		{
+			return this.quantity;
 		}
 		
 	}
