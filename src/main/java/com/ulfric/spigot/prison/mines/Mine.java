@@ -12,6 +12,7 @@ public final class Mine extends Bean {
 	private final String region;
 	private final String mine;
 	private final DropTable dropTable = new DropTable();
+
 	Mine(String region, String mine,
 			List<MineBlock> mineBlocks)
 	{
@@ -22,6 +23,7 @@ public final class Mine extends Bean {
 			dropTable.add(new Drop(mineBlock, mineBlock.getWeight()));
 		}
 	}
+
 	Mine(String region, String mine)
 	{
 		this(region, mine, new ArrayList<>());

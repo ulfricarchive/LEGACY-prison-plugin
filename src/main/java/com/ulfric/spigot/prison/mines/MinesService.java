@@ -1,6 +1,5 @@
 package com.ulfric.spigot.prison.mines;
 
-import com.google.gson.GsonBuilder;
 import com.ulfric.commons.spigot.chunk.ChunkUtils;
 import com.ulfric.commons.spigot.data.Data;
 import com.ulfric.commons.spigot.data.DataStore;
@@ -69,9 +68,6 @@ public final class MinesService implements Mines {
 					.build();
 
 			this.mines.add(mine);
-			System.out.println("Loaded mine: " + mine.getMine());
-			System.out
-					.println(new GsonBuilder().setPrettyPrinting().create().toJson(mine.getDropTable()));
 		});
 	}
 
@@ -136,9 +132,6 @@ public final class MinesService implements Mines {
 						Chunk chunk = world.getChunkAt(entry.getKey().x, entry.getKey().z);
 						ChunkUtils.applyChanges(chunk, entry.getValue());
 					}
-					System.out.println(
-							"Resenting Mine: " + mine.getMine() + " --- " + (System.currentTimeMillis() - start)
-									+ "ms");
 				});
 
 			});
