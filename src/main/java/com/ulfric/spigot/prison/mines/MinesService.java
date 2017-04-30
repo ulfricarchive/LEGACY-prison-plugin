@@ -1,15 +1,5 @@
 package com.ulfric.spigot.prison.mines;
 
-import com.ulfric.commons.spigot.chunk.ChunkUtils;
-import com.ulfric.commons.spigot.data.Data;
-import com.ulfric.commons.spigot.data.DataStore;
-import com.ulfric.commons.spigot.guard.Guard;
-import com.ulfric.commons.spigot.guard.Point;
-import com.ulfric.commons.spigot.guard.Region;
-import com.ulfric.commons.spigot.plugin.PluginUtils;
-import com.ulfric.dragoon.container.Container;
-import com.ulfric.dragoon.initialize.Initialize;
-import com.ulfric.dragoon.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,14 +9,27 @@ import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Stream;
-import net.minecraft.server.v1_11_R1.Chunk;
-import net.minecraft.server.v1_11_R1.ChunkSection;
-import net.minecraft.server.v1_11_R1.IBlockData;
-import net.minecraft.server.v1_11_R1.World;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_11_R1.CraftWorld;
 import org.bukkit.plugin.Plugin;
+
+import com.ulfric.commons.spigot.chunk.ChunkUtils;
+import com.ulfric.commons.spigot.data.Data;
+import com.ulfric.commons.spigot.data.DataStore;
+import com.ulfric.commons.spigot.guard.Guard;
+import com.ulfric.commons.spigot.guard.Region;
+import com.ulfric.commons.spigot.plugin.PluginUtils;
+import com.ulfric.commons.spigot.shape.Point;
+import com.ulfric.dragoon.container.Container;
+import com.ulfric.dragoon.initialize.Initialize;
+import com.ulfric.dragoon.inject.Inject;
+
+import net.minecraft.server.v1_11_R1.Chunk;
+import net.minecraft.server.v1_11_R1.ChunkSection;
+import net.minecraft.server.v1_11_R1.IBlockData;
+import net.minecraft.server.v1_11_R1.World;
 
 public final class MinesService implements Mines {
 
@@ -62,7 +65,7 @@ public final class MinesService implements Mines {
 			});
 
 			Mine mine = Mine.builder()
-					.setMine(name)
+					.setName(name)
 					.setRegion(region)
 					.setMineBlocks(mineBlocks)
 					.build();
@@ -81,8 +84,6 @@ public final class MinesService implements Mines {
 	@Override
 	public void regenerate(Mine mine)
 	{
-		long start = System.currentTimeMillis();
-
 		Region region = Guard.getService().getRegion(mine.getRegion());
 		Objects.requireNonNull(region, "Region is null");
 

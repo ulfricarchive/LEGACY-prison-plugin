@@ -179,11 +179,6 @@ public class CommandBlocks implements Command {
 			this.quantity = quantity;
 		}
 		
-		Item(MaterialType materialType)
-		{
-			this(materialType, 1);
-		}
-		
 		public MaterialType getMaterial()
 		{
 			return this.materialType;

@@ -1,82 +1,37 @@
 package com.ulfric.spigot.prison.mines;
 
-import com.ulfric.commons.bean.Bean;
-import com.ulfric.plugin.platform.droptable.Drop;
-import com.ulfric.plugin.platform.droptable.DropTable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public final class Mine extends Bean {
+import com.ulfric.commons.bean.Bean;
+import com.ulfric.commons.naming.Named;
+import com.ulfric.commons.spigot.weighted.WeightedTable;
+import com.ulfric.commons.spigot.weighted.WeightedValue;
 
-	private final String region;
-	private final String mine;
-	private final DropTable dropTable = new DropTable();
-
-	Mine(String region, String mine,
-			List<MineBlock> mineBlocks)
-	{
-		this.region = region;
-		this.mine = mine;
-		for (MineBlock mineBlock : mineBlocks)
-		{
-			dropTable.add(new Drop(mineBlock, mineBlock.getWeight()));
-		}
-	}
-
-	Mine(String region, String mine)
-	{
-		this(region, mine, new ArrayList<>());
-	}
+public final class Mine extends Bean implements Named {
 
 	public static Builder builder()
 	{
 		return new Builder();
 	}
 
-	public String getRegion()
+	public static final class Builder implements org.apache.commons.lang3.builder.Builder<Mine>
 	{
-		return this.region;
-	}
-
-	public String getMine()
-	{
-		return this.mine;
-	}
-
-	public MineBlock getNextBLock()
-	{
-		return (MineBlock) dropTable.nextDrop().getValue();
-	}
-
-	public DropTable getDropTable()
-	{
-		return dropTable;
-	}
-
-	public static final class Builder implements org.apache.commons.lang3.builder.Builder<Mine> {
-
 		private String region;
-		private String mine;
+		private String name;
 		private List<MineBlock> mineBlocks;
 
-		Builder()
-		{
-
-		}
+		Builder() { }
 
 		@Override
 		public Mine build()
 		{
-			Objects.requireNonNull(this.region);
-			Objects.requireNonNull(this.mine);
+			Objects.requireNonNull(this.region, "region");
+			Objects.requireNonNull(this.name, "name");
+			Objects.requireNonNull(this.mineBlocks, "mineBlocks");
 
-			if (this.mineBlocks == null)
-			{
-				return new Mine(this.region, this.mine);
-			}
-
-			return new Mine(this.region, this.mine, this.mineBlocks);
+			return new Mine(this.region, this.name, new ArrayList<>(this.mineBlocks));
 		}
 
 		public Builder setRegion(String region)
@@ -85,9 +40,9 @@ public final class Mine extends Bean {
 			return this;
 		}
 
-		public Builder setMine(String mine)
+		public Builder setName(String name)
 		{
-			this.mine = mine;
+			this.name = name;
 			return this;
 		}
 
@@ -96,7 +51,44 @@ public final class Mine extends Bean {
 			this.mineBlocks = mineBlocks;
 			return this;
 		}
+	}
 
+	private final String region;
+	private final String name;
+	private final WeightedTable<MineBlock> blocks;
+
+	Mine(String region, String name,
+			List<MineBlock> mineBlocks)
+	{
+		this.region = region;
+		this.name = name;
+		this.blocks = this.createBlocksTable(mineBlocks);
+	}
+
+	private WeightedTable<MineBlock> createBlocksTable(List<MineBlock> blocks)
+	{
+		WeightedTable.Builder<MineBlock> builder = WeightedTable.builder();
+		for (MineBlock block : blocks)
+		{
+			builder.add(new WeightedValue<>(block, block.getWeight()));
+		}
+		return builder.build();
+	}
+
+	public String getRegion()
+	{
+		return this.region;
+	}
+
+	@Override
+	public String getName()
+	{
+		return this.name;
+	}
+
+	public MineBlock getNextBLock()
+	{
+		return blocks.nextValue();
 	}
 
 }
