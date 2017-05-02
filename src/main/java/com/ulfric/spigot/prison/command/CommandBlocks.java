@@ -37,7 +37,7 @@ public class CommandBlocks implements Command {
 			
 			int blocks = (int) Math.floor(integer / from.getQuantity());
 			
-			this.take(player, new ItemStack(from.getMaterial().getType(), 1, from.getMaterial().getData()), integer * from.getQuantity());
+			this.take(player, new ItemStack(from.getMaterial().getType(), 1, from.getMaterial().getData()), blocks * from.getQuantity());
 			this.give(player, new ItemStack(translation.getTo().getType(), 1, translation.getTo().getData()), blocks);
 		});
 		
