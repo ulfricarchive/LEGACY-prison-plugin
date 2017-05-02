@@ -6,6 +6,7 @@ import com.ulfric.commons.spigot.command.Context;
 import com.ulfric.commons.spigot.command.MustBePlayer;
 import com.ulfric.commons.spigot.command.Permission;
 import com.ulfric.commons.spigot.text.Text;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.time.Instant;
@@ -24,7 +25,7 @@ public class CommandFix implements Command {
 	
 	final boolean isFixable(ItemStack itemStack)
 	{
-		return itemStack != null && itemStack.getDurability() != 0;
+		return itemStack != null && itemStack.getType() != Material.AIR && itemStack.getDurability() != 0;
 	}
 	
 	final String format(Instant instant)
