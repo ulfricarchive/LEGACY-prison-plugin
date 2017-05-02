@@ -14,7 +14,7 @@ import com.ulfric.commons.spigot.command.Permission;
 @MustBePlayer
 class CommandFeed implements Command {
 
-	private static final int MAX_FOOD_LEVEL = 20;
+	private static final int MAX_FOOD_LEVEL = 25;
 
 	@Override
 	public void run(Context context)

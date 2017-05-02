@@ -15,12 +15,12 @@ import org.bukkit.entity.Player;
 public class CommandEnderchest implements Command
 {
 
-    @Override
-    public void run(Context context)
-    {
-        Player player = (Player) context.getSender();
+	@Override
+	public void run(Context context)
+	{
+		Player player = (Player) context.getSender();
 
-        player.openInventory(player.getEnderChest());
-    }
+		player.openInventory(player.getEnderChest());
+	}
 
 }

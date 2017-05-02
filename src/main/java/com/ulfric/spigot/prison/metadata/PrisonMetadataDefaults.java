@@ -9,6 +9,8 @@ public class PrisonMetadataDefaults {
 	public static final String LAST_FIX_HAND_COOLDOWN = "LastFixHandCooldown";
 	public static final String LAST_FIX_ALL_COOLDOWN = "LastFixAllCooldown";
 	public static final String LAST_BLOCKS_QUANTITY = "LastBlocksQuantity";
+	public static final String LAST_CLEARED_INVENTORY_TARGET = "LastClearedInventoryTarget";
+	public static final String LAST_CLEARED_INVENTORY_SENDER = "LastClearedInventorySender";
 
 	private PrisonMetadataDefaults()
 	{

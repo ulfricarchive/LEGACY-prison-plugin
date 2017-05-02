@@ -20,6 +20,7 @@ public class EssentialCommandsContainer extends Container {
 		this.install(CommandFixHand.class);
 		this.install(CommandFixAll.class);
 		this.install(CommandBlocks.class);
+		this.install(CommandClearInventory.class);
 	}
 
 }

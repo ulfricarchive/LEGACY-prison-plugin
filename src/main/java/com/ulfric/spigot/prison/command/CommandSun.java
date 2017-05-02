@@ -14,14 +14,14 @@ import org.bukkit.entity.Player;
 @MustBePlayer
 public class CommandSun implements Command {
 
-    @Override
-    public void run(Context context)
-    {
-        Player player = (Player) context.getSender();
+	@Override
+	public void run(Context context)
+	{
+		Player player = (Player) context.getSender();
 
-        player.setPlayerWeather(WeatherType.CLEAR);
+		player.setPlayerWeather(WeatherType.CLEAR);
 
-        Text.getService().sendMessage(player, "sun-use");
-    }
+		Text.getService().sendMessage(player, "sun-use");
+	}
 
 }
