@@ -5,6 +5,6 @@ import org.bukkit.entity.Player;
 
 public interface Cosmetic extends Named {
 	
-	boolean run(Player player);
+	boolean run(Player player, int tier);
 	
 }

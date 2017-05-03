@@ -6,11 +6,11 @@ import org.bukkit.inventory.ItemStack;
 
 public interface CosmeticItem extends Cosmetic {
 	
-	ItemStack getCosmetic();
+	ItemStack getCosmetic(int tier);
 	
-	default boolean hasCosmetic(Inventory inventory)
+	default boolean hasCosmetic(Inventory inventory, int tier)
 	{
-		ItemStack cosmetic = this.getCosmetic();
+		ItemStack cosmetic = this.getCosmetic(tier);
 		
 		for (ItemStack itemStack : inventory.getContents())
 		{
@@ -28,9 +28,9 @@ public interface CosmeticItem extends Cosmetic {
 		return false;
 	}
 	
-	default boolean hasCosmetic(Player player)
+	default boolean hasCosmetic(Player player, int tier)
 	{
-		return this.hasCosmetic(player.getInventory());
+		return this.hasCosmetic(player.getInventory(), tier);
 	}
 	
 }

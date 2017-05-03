@@ -5,6 +5,7 @@ import com.ulfric.commons.naming.Named;
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;
 import com.ulfric.dragoon.inject.Inject;
+import com.ulfric.spigot.prison.cosmetic.cosmetics.MineBombCosmetic;
 import com.ulfric.spigot.prison.cosmetic.cosmetics.MineRocketCosmetic;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -27,6 +28,7 @@ public class CosmeticService implements Cosmetics {
 	@Initialize
 	private void setup()
 	{
+		this.register(MineBombCosmetic.class);
 		this.register(MineRocketCosmetic.class);
 	}
 	
@@ -59,7 +61,7 @@ public class CosmeticService implements Cosmetics {
 	@Override
 	public CosmeticItem match(ItemStack itemStack)
 	{
-		return this.getCosmeticItems().stream().filter(cosmetic -> cosmetic.getCosmetic().isSimilar(itemStack)).findFirst().orElse(null);
+		return this.getCosmeticItems().stream().filter(cosmetic -> cosmetic.getCosmetic(1).isSimilar(itemStack)).findFirst().orElse(null);
 	}
 	
 	@Override
@@ -75,18 +77,11 @@ public class CosmeticService implements Cosmetics {
 	}
 	
 	@Override
-	public void give(Player player, String name, int amount)
+	public void give(Player player, Cosmetic cosmetic, int tier, int amount)
 	{
-		Cosmetic cosmetic = this.getCosmetic(name);
-		
-		if (cosmetic == null)
-		{
-			return;
-		}
-				
 		if (cosmetic instanceof CosmeticItem)
 		{
-			ItemStack itemStack = ((CosmeticItem) cosmetic).getCosmetic().clone();
+			ItemStack itemStack = ((CosmeticItem) cosmetic).getCosmetic(tier).clone();
 			
 			this.give(player, itemStack, amount);
 		}
@@ -113,18 +108,11 @@ public class CosmeticService implements Cosmetics {
 	}
 	
 	@Override
-	public void take(Player player, String name, int amount)
+	public void take(Player player, Cosmetic cosmetic, int tier, int amount)
 	{
-		Cosmetic cosmetic = this.getCosmetic(name);
-		
-		if (cosmetic == null)
-		{
-			return;
-		}
-		
 		if (cosmetic instanceof CosmeticItem)
 		{
-			ItemStack itemStack = ((CosmeticItem) cosmetic).getCosmetic().clone();
+			ItemStack itemStack = ((CosmeticItem) cosmetic).getCosmetic(tier).clone();
 			
 			this.take(player, itemStack, amount);
 		}

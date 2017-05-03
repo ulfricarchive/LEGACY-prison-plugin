@@ -69,20 +69,29 @@ public class CosmeticCommand implements Command {
 	@Argument(optional = true)
 	private Integer amount;
 	
+	@Argument(optional = true)
+	private Integer tier;
+	
 	@Override
 	public void run(Context context)
 	{
 		Player target = this.target;
 		Integer amount = this.amount;
+		Integer tier = this.tier;
 		
 		if (amount == null)
 		{
 			amount = 1;
 		}
 		
+		if (tier == null)
+		{
+			tier = 1;
+		}
+		
 		Cosmetics cosmetics = Cosmetics.getService();
 		CosmeticType type = this.getClass().getAnnotation(CosmeticType.class);
-		cosmetics.give(target, type.value(), amount);
+		cosmetics.give(target, type.value(), tier, amount);
 		
 		Text text = Text.getService();
 		CommandSender sender = context.getSender();

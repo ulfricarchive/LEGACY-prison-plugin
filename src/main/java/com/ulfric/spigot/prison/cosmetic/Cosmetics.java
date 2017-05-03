@@ -28,18 +28,38 @@ public interface Cosmetics extends Service {
 	
 	List<CosmeticItem> getCosmeticItems();
 	
-	void give(Player player, String cosmetic, int amount);
+	void give(Player player, Cosmetic cosmetic, int tier, int amount);
+	
+	default void give(Player player, String name, int tier, int amount)
+	{
+		Cosmetic cosmetic = this.getCosmetic(name);
+		
+		if (cosmetic != null)
+		{
+			this.give(player, cosmetic, tier, amount);
+		}
+	}
 	
 	default void give(Player player, String name)
 	{
-		this.give(player, name, 1);
+		this.give(player, name, 1, 1);
 	}
 	
-	void take(Player player, String name, int amount);
+	void take(Player player, Cosmetic cosmetic, int tier, int amount);
+	
+	default void take(Player player, String name, int tier, int amount)
+	{
+		Cosmetic cosmetic = this.getCosmetic(name);
+		
+		if (name != null)
+		{
+			this.take(player, cosmetic, tier, amount);
+		}
+	}
 	
 	default void take(Player player, String name)
 	{
-		this.take(player, name, 1);
+		this.take(player, name, 1, 1);
 	}
 	
 }

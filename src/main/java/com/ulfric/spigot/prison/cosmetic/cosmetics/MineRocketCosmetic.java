@@ -1,7 +1,10 @@
 package com.ulfric.spigot.prison.cosmetic.cosmetics;
 
 import com.ulfric.commons.naming.Name;
+import com.ulfric.commons.spigot.item.Item;
+import com.ulfric.commons.spigot.item.MaterialType;
 import com.ulfric.spigot.prison.cosmetic.CosmeticItem;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -9,15 +12,20 @@ import org.bukkit.inventory.ItemStack;
 public class MineRocketCosmetic implements CosmeticItem {
 	
 	@Override
-	public ItemStack getCosmetic()
+	public boolean run(Player player, int tier)
 	{
-		return null;
+		return false;
 	}
 	
 	@Override
-	public boolean run(Player player)
+	public ItemStack getCosmetic(int tier)
 	{
-		return false;
+		return Item.builder()
+				.setMaterialType(MaterialType.getType(Material.FIREWORK, (byte) 0))
+				.setDisplayName("&cMine Rocket &7(Right Click)")
+				.colorize()
+				.build()
+				.getItemStack();
 	}
 	
 }
