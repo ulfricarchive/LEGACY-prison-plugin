@@ -23,9 +23,10 @@ class MineBombListener implements Listener {
 	private void on(PlayerInteractEvent event)
 	{
 		Player player = event.getPlayer();
+		Action action = event.getAction();
 		
-		if (event.getAction() != Action.RIGHT_CLICK_AIR ||
-				event.getAction() != Action.RIGHT_CLICK_BLOCK)
+		if (action != Action.RIGHT_CLICK_BLOCK &&
+				action != Action.RIGHT_CLICK_AIR)
 		{
 			return;
 		}
@@ -40,29 +41,21 @@ class MineBombListener implements Listener {
 		
 		event.setCancelled(true);
 		
+		Block origin = this.getOrigin(event);
+		
+		this.performMineBomb(player, tier, origin);
+	}
+
+	private Block getOrigin(PlayerInteractEvent event)
+	{
 		Block block = event.getClickedBlock();
+		
 		if (block == null)
 		{
-			block = player.getLocation().getBlock();
+			block = event.getPlayer().getLocation().getBlock();
 		}
 		
-		if (!this.callFakeBreak(player, block))
-		{
-			Text.getService().sendMessage(player, "minebomb-not-in-mine");
-			return;
-		}
-		
-		Set<Block> blocks = this.getBlocks(player, block, tier);
-		
-		if (blocks.isEmpty())
-		{
-			Text.getService().sendMessage(player, "minebomb-no-surrounding-blocks");
-			return;
-		}
-		
-		MineBombs.getService().take(player, tier, 1);
-		
-		this.handleBlockBreak(player, blocks);
+		return block;
 	}
 	
 	private Set<Block> getBlocks(Player player, Block origin, int radius)
@@ -82,7 +75,7 @@ class MineBombListener implements Listener {
 				{
 					Block current = origin.getWorld().getBlockAt(x, y, z);
 					
-					if (!this.callFakeBreak(player, current) || !this.isValidBlock(current))
+					if (!this.isBreakable(player, current))
 					{
 						continue;
 					}
@@ -105,6 +98,11 @@ class MineBombListener implements Listener {
 		return block.getType() != Material.AIR;
 	}
 	
+	private boolean isBreakable(Player player, Block block)
+	{
+		return this.callFakeBreak(player, block) && this.isValidBlock(block);
+	}
+	
 	private void handleBlockBreak(Player player, Set<Block> blocks)
 	{
 		blocks.forEach(block ->
@@ -112,6 +110,37 @@ class MineBombListener implements Listener {
 			block.getDrops().forEach(player.getInventory()::addItem);
 			block.setType(Material.AIR);
 		});
+	}
+	
+	private void performMineBomb(Player player, int tier, Block origin)
+	{
+		Set<Block> blocks = this.getBlocks(player, origin, tier);
+		
+		if (!this.validateMineBomb(player, origin, blocks))
+		{
+			return;
+		}
+		
+		MineBombs.getService().take(player, tier, 1);
+		
+		this.handleBlockBreak(player, blocks);
+	}
+	
+	private boolean validateMineBomb(Player player, Block origin, Set<Block> blocks)
+	{
+		if (!this.callFakeBreak(player, origin))
+		{
+			Text.getService().sendMessage(player, "minebomb-not-in-mine");
+			return false;
+		}
+		
+		if (blocks.isEmpty())
+		{
+			Text.getService().sendMessage(player, "minebomb-no-surrounding-blocks");
+			return false;
+		}
+		
+		return true;
 	}
 	
 }
