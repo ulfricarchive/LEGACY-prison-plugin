@@ -32,8 +32,7 @@ class MineBombListener implements Listener {
 		
 		ItemStack item = event.getItem();
 		
-		Integer tier =  MineBombs.getService().getTier(item);
-		
+		Integer tier = MineBombs.getService().getTier(item);
 		if (tier == null || tier <= 0)
 		{
 			return;
@@ -47,11 +46,9 @@ class MineBombListener implements Listener {
 			block = player.getLocation().getBlock();
 		}
 		
-		Text text = Text.getService();
-		
 		if (!this.callFakeBreak(player, block))
 		{
-			text.sendMessage(player, "minebomb-not-in-mine");
+			Text.getService().sendMessage(player, "minebomb-not-in-mine");
 			return;
 		}
 		
@@ -59,7 +56,7 @@ class MineBombListener implements Listener {
 		
 		if (blocks.isEmpty())
 		{
-			text.sendMessage(player, "minebomb-no-surrounding-blocks");
+			Text.getService().sendMessage(player, "minebomb-no-surrounding-blocks");
 			return;
 		}
 		
