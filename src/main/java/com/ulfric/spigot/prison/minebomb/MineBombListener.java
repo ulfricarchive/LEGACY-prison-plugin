@@ -1,7 +1,7 @@
 package com.ulfric.spigot.prison.minebomb;
 
-import com.ulfric.commons.spigot.guard.Flag;
-import com.ulfric.commons.spigot.guard.Guard;
+import com.ulfric.commons.spigot.event.Events;
+import com.ulfric.commons.spigot.intercept.RequirePermission;
 import com.ulfric.commons.spigot.text.Text;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -17,74 +18,77 @@ import java.util.Set;
 
 class MineBombListener implements Listener {
 	
-	private final Guard guard;
-	
-	MineBombListener()
-	{
-		this.guard = Guard.getService();
-	}
-	
 	@EventHandler
+	@RequirePermission(permission = "minebomb-item-use")
 	private void on(PlayerInteractEvent event)
 	{
 		Player player = event.getPlayer();
 		
-		if (event.getAction() == Action.RIGHT_CLICK_AIR ||
-				event.getAction() == Action.RIGHT_CLICK_BLOCK)
+		if (event.getAction() != Action.RIGHT_CLICK_AIR ||
+				event.getAction() != Action.RIGHT_CLICK_BLOCK)
 		{
-			ItemStack item = event.getItem();
-			
-			Integer tier =  MineBombs.getService().getTier(item);
-			
-			if (tier != null && tier > 0)
-			{
-				event.setCancelled(true);
-				
-				Block block = event.getClickedBlock();
-				if (block == null)
-				{
-					block = player.getLocation().getBlock();
-				}
-				
-				Text text = Text.getService();
-				
-				if (this.isNotAllowed(block))
-				{
-					text.sendMessage(player, "minebombs-not-in-mine");
-					return;
-				}
-				
-				Set<Block> blocks = this.getBlocks(block, tier);
-				
-				if (blocks.isEmpty())
-				{
-					text.sendMessage(player, "minebombs-no-surrounding-blocks");
-					return;
-				}
-				
-				MineBombs.getService().take(player, tier, 1);
-				
-				blocks.forEach(b ->
-				{
-					b.getDrops().forEach(itemStack -> player.getInventory().addItem(itemStack));
-					b.setType(Material.AIR);
-				});
-			}
+			return;
 		}
+		
+		ItemStack item = event.getItem();
+		
+		Integer tier =  MineBombs.getService().getTier(item);
+		
+		if (tier == null || tier <= 0)
+		{
+			return;
+		}
+		
+		event.setCancelled(true);
+		
+		Block block = event.getClickedBlock();
+		if (block == null)
+		{
+			block = player.getLocation().getBlock();
+		}
+		
+		Text text = Text.getService();
+		
+		if (!this.callFakeBreak(player, block))
+		{
+			text.sendMessage(player, "minebomb-not-in-mine");
+			return;
+		}
+		
+		Set<Block> blocks = this.getBlocks(player, block, tier);
+		
+		if (blocks.isEmpty())
+		{
+			text.sendMessage(player, "minebomb-no-surrounding-blocks");
+			return;
+		}
+		
+		MineBombs.getService().take(player, tier, 1);
+		
+		this.handleBlockBreak(player, blocks);
 	}
 	
-	private Set<Block> getBlocks(Block origin, int radius)
+	private Set<Block> getBlocks(Player player, Block origin, int radius)
 	{
 		Set<Block> blocks = new HashSet<>();
 		blocks.add(origin);
 		
-		for (int x = origin.getX() - radius; x <= origin.getX() + radius; x++)
+		int originX = origin.getX();
+		int originY = origin.getY();
+		int originZ = origin.getZ();
+		
+		for (int x = originX - radius; x <= originX + radius; x++)
 		{
-			for (int y = origin.getY() - radius; y <= origin.getY() + radius; y++)
+			for (int y = originY - radius; y <= originY + radius; y++)
 			{
-				for (int z = origin.getZ() - radius; z <= origin.getZ() + radius; z++)
+				for (int z = originZ - radius; z <= originZ + radius; z++)
 				{
 					Block current = origin.getWorld().getBlockAt(x, y, z);
+					
+					if (!this.callFakeBreak(player, current) || !this.isValidBlock(current))
+					{
+						continue;
+					}
 					
 					blocks.add(current);
 				}
@@ -94,10 +98,23 @@ class MineBombListener implements Listener {
 		return blocks;
 	}
 	
-	@SuppressWarnings("unchecked")
-	private boolean isNotAllowed(Block block)
+	private boolean callFakeBreak(Player player, Block block)
 	{
-		return !this.guard.isAllowed(block.getLocation(), (Flag<Boolean>) this.guard.getFlag("Break"));
+		return Events.fire(new BlockBreakEvent(block, player)).isCancelled();
+	}
+	
+	private boolean isValidBlock(Block block)
+	{
+		return block.getType() != Material.AIR;
+	}
+	
+	private void handleBlockBreak(Player player, Set<Block> blocks)
+	{
+		blocks.forEach(block ->
+		{
+			block.getDrops().forEach(player.getInventory()::addItem);
+			block.setType(Material.AIR);
+		});
 	}
 	
 }
