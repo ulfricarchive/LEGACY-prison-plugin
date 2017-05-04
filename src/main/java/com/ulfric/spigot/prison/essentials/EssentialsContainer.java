@@ -21,6 +21,8 @@ public class EssentialsContainer extends Container {
 		this.install(FixAllCommand.class);
 		this.install(BlocksCommand.class);
 		this.install(ClearInventoryCommand.class);
+		this.install(WorldCommand.class);
+		this.install(WorldCreateCommand.class);
 	}
 
 }
