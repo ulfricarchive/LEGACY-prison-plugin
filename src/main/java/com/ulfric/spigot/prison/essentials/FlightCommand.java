@@ -14,7 +14,7 @@ import com.ulfric.commons.spigot.text.Text;
 @Alias({"float", "fly", "hover"})
 @Permission("flight-use")
 @MustBePlayer
-public class FlightCommand implements Command {
+class FlightCommand implements Command {
 
     @Override
     public void run(Context context)

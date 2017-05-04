@@ -8,7 +8,7 @@ import com.ulfric.commons.spigot.text.placeholder.Placeholder;
 import com.ulfric.spigot.prison.metadata.PrisonMetadataDefaults;
 
 @Name("LAST_SPAWNER_TYPE")
-public class LastSpawnerTypePlaceholder implements Placeholder {
+class LastSpawnerTypePlaceholder implements Placeholder {
 
 	@Override
 	public String apply(CommandSender to)

@@ -15,7 +15,7 @@ import com.ulfric.commons.spigot.text.Text;
 @Name("world")
 @Permission("world-use")
 @MustBePlayer
-public class WorldCommand implements Command {
+class WorldCommand implements Command {
 
 	@Argument
 	private String worldName;

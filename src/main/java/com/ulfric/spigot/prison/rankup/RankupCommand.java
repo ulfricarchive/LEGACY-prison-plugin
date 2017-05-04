@@ -1,5 +1,7 @@
 package com.ulfric.spigot.prison.rankup;
 
+import org.bukkit.entity.Player;
+
 import com.ulfric.commons.naming.Name;
 import com.ulfric.commons.spigot.command.Command;
 import com.ulfric.commons.spigot.command.Context;
@@ -10,12 +12,11 @@ import com.ulfric.commons.spigot.economy.BankAccount;
 import com.ulfric.commons.spigot.economy.Economy;
 import com.ulfric.commons.spigot.text.Text;
 import com.ulfric.spigot.prison.metadata.PrisonMetadataDefaults;
-import org.bukkit.entity.Player;
 
 @Name("rankup")
 @Permission("rankup-use")
 @MustBePlayer
-public class RankupCommand implements Command {
+class RankupCommand implements Command {
 	
 	@Override
 	public void run(Context context)

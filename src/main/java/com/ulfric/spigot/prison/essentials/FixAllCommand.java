@@ -1,5 +1,11 @@
 package com.ulfric.spigot.prison.essentials;
 
+import java.time.Instant;
+
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
 import com.ulfric.commons.naming.Name;
 import com.ulfric.commons.spigot.command.Context;
 import com.ulfric.commons.spigot.command.MustBePlayer;
@@ -9,16 +15,11 @@ import com.ulfric.commons.spigot.cooldown.CooldownAccount;
 import com.ulfric.commons.spigot.cooldown.Cooldowns;
 import com.ulfric.commons.spigot.text.Text;
 import com.ulfric.spigot.prison.metadata.PrisonMetadataDefaults;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-
-import java.time.Instant;
 
 @Name("all")
 @Permission("fix-all-use")
 @MustBePlayer
-public class FixAllCommand extends FixCommand {
+class FixAllCommand extends FixCommand {
 
 	private static final String COOLDOWN_NAME = "COMMAND_FIX_ALL";
 

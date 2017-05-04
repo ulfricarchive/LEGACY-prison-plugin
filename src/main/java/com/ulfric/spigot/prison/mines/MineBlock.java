@@ -1,6 +1,8 @@
 package com.ulfric.spigot.prison.mines;
 
-public class MineBlock {
+import com.ulfric.commons.bean.Bean;
+
+public class MineBlock extends Bean {
 
 	private final String material;
 	private final int weight;
@@ -19,35 +21,6 @@ public class MineBlock {
 	public int getWeight()
 	{
 		return this.weight;
-	}
-
-	@Override
-	public String toString()
-	{
-		return new StringBuilder(this.material).append(":").append(this.weight).toString();
-	}
-
-	@Override
-	public boolean equals(Object o)
-	{
-		if (this == o)
-		{
-			return true;
-		}
-		if (o == null || getClass() != o.getClass())
-		{
-			return false;
-		}
-
-		MineBlock mineBlock = (MineBlock) o;
-
-		return material != null ? material.equals(mineBlock.material) : mineBlock.material == null;
-	}
-
-	@Override
-	public int hashCode()
-	{
-		return material != null ? material.hashCode() : 0;
 	}
 
 }

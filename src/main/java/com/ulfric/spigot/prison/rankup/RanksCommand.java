@@ -8,7 +8,7 @@ import com.ulfric.commons.spigot.text.Text;
 
 @Name("ranks")
 @Permission("ranks-use")
-public class RanksCommand implements Command {
+class RanksCommand implements Command {
 	
 	@Override
 	public void run(Context context)

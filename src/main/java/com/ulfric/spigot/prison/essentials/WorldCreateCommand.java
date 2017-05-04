@@ -12,7 +12,7 @@ import com.ulfric.commons.spigot.text.Text;
 
 @Name("create")
 @Permission("world-create-use")
-public class WorldCreateCommand extends WorldCommand {
+class WorldCreateCommand extends WorldCommand {
 
 	@Argument
 	private String worldName;

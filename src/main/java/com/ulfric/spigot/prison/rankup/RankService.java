@@ -1,5 +1,18 @@
 package com.ulfric.spigot.prison.rankup;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.map.CaseInsensitiveMap;
+import org.bukkit.entity.Player;
+
 import com.ulfric.commons.identity.Identifiable;
 import com.ulfric.commons.identity.Identity;
 import com.ulfric.commons.spigot.data.Data;
@@ -11,27 +24,12 @@ import com.ulfric.commons.spigot.permissions.Permissions;
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;
 import com.ulfric.dragoon.inject.Inject;
-import org.bukkit.entity.Player;
-
-import org.apache.commons.collections4.map.CaseInsensitiveMap;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class RankService implements Ranks {
 	
 	@Inject
 	private Container owner;
-	
-	private DataStore folder;
-	
+
 	private final LinkedList<Rank> orderedRanks = new LinkedList<>();
 	private final Map<String, Rank> ranks = new CaseInsensitiveMap<>();
 	private final Map<UUID, Rank> userRanks = new ConcurrentHashMap<>();
@@ -39,10 +37,10 @@ public class RankService implements Ranks {
 	@Initialize
 	private void initialize()
 	{
-		this.folder = Data.getDataStore(this.owner).getDataStore("ranks");
+		DataStore folder = Data.getDataStore(this.owner).getDataStore("ranks");
 		
 		this.ranks.clear();
-		this.loadRanks(this.folder.getData("ranks"));
+		this.loadRanks(folder.getData("ranks"));
 		
 		this.order();
 	}
@@ -73,7 +71,7 @@ public class RankService implements Ranks {
 	private void order()
 	{
 		this.orderedRanks.clear();
-		this.orderedRanks.addAll(getRanks());
+		this.orderedRanks.addAll(this.getRanks());
 		this.orderedRanks.sort(Rank::compareTo);
 	}
 	
@@ -111,7 +109,7 @@ public class RankService implements Ranks {
 	{
 		return this.userRanks.computeIfAbsent(player.getUniqueId(), uuid ->
 		{
-			Rank rank = getRankFromParent(uuid);
+			Rank rank = this.getRankFromParent(uuid);
 			return rank == null ? this.getFirst() : rank;
 		});
 	}
@@ -151,7 +149,7 @@ public class RankService implements Ranks {
 		
 		List<Rank> ranks = new ArrayList<>();
 		
-		names.forEach(name -> ranks.add(getRank(name)));
+		names.forEach(name -> ranks.add(this.getRank(name)));
 		
 		ranks.sort(Rank::compareTo);
 		

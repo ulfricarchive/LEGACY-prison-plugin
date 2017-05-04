@@ -1,5 +1,14 @@
 package com.ulfric.spigot.prison.essentials;
 
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
 import com.ulfric.commons.naming.Name;
 import com.ulfric.commons.spigot.command.Command;
 import com.ulfric.commons.spigot.command.Context;
@@ -8,19 +17,11 @@ import com.ulfric.commons.spigot.command.Permission;
 import com.ulfric.commons.spigot.item.MaterialType;
 import com.ulfric.commons.spigot.text.Text;
 import com.ulfric.spigot.prison.metadata.PrisonMetadataDefaults;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 @Name("blocks")
 @Permission("blocks-use")
 @MustBePlayer
-public class BlocksCommand implements Command {
+class BlocksCommand implements Command {
 	
 	private static final String BLOCKS_USE_ALL_PERMISSION = "blocks-use-all";
 	

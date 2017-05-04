@@ -20,7 +20,7 @@ import com.ulfric.spigot.prison.metadata.PrisonMetadataDefaults;
 @Name("spawner")
 @Permission("spawner-use")
 @MustBePlayer
-public class SpawnerCommand implements Command {
+class SpawnerCommand implements Command {
 
 	@Argument
 	private EntityType type;

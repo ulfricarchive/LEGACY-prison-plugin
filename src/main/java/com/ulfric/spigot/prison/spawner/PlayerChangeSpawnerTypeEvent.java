@@ -20,7 +20,7 @@ public class PlayerChangeSpawnerTypeEvent extends PlayerEvent implements Cancell
 	private final EntityType newType;
 	private boolean cancel;
 
-	public PlayerChangeSpawnerTypeEvent(Player who, CreatureSpawner spawner, EntityType newType)
+	PlayerChangeSpawnerTypeEvent(Player who, CreatureSpawner spawner, EntityType newType)
 	{
 		super(who);
 

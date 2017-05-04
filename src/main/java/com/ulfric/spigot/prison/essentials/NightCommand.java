@@ -1,17 +1,18 @@
 package com.ulfric.spigot.prison.essentials;
 
+import org.bukkit.entity.Player;
+
 import com.ulfric.commons.naming.Name;
 import com.ulfric.commons.spigot.command.Command;
 import com.ulfric.commons.spigot.command.Context;
 import com.ulfric.commons.spigot.command.MustBePlayer;
 import com.ulfric.commons.spigot.command.Permission;
 import com.ulfric.commons.spigot.text.Text;
-import org.bukkit.entity.Player;
 
 @Name("night")
 @Permission("night-use")
 @MustBePlayer
-public class NightCommand implements Command {
+class NightCommand implements Command {
 
     private static final long TIME = 19_500L;
 

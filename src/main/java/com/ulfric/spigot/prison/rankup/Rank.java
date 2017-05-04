@@ -1,9 +1,9 @@
 package com.ulfric.spigot.prison.rankup;
 
+import java.util.Objects;
+
 import com.ulfric.commons.bean.Bean;
 import com.ulfric.commons.spigot.economy.CurrencyAmount;
-
-import java.util.Objects;
 
 public class Rank extends Bean implements Comparable<Rank> {
 	
@@ -48,7 +48,7 @@ public class Rank extends Bean implements Comparable<Rank> {
 	private final String name;
 	private final CurrencyAmount currencyAmount;
 	
-	Rank(String name, CurrencyAmount currencyAmount)
+	private Rank(String name, CurrencyAmount currencyAmount)
 	{
 		this.name = name;
 		this.currencyAmount = currencyAmount;

@@ -15,6 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_11_R1.CraftWorld;
 import org.bukkit.plugin.Plugin;
 
+import com.ulfric.commons.bean.Bean;
 import com.ulfric.commons.spigot.chunk.ChunkUtils;
 import com.ulfric.commons.spigot.data.Data;
 import com.ulfric.commons.spigot.data.DataStore;
@@ -31,12 +32,13 @@ import net.minecraft.server.v1_11_R1.ChunkSection;
 import net.minecraft.server.v1_11_R1.IBlockData;
 import net.minecraft.server.v1_11_R1.World;
 
-public final class MinesService implements Mines {
+final class MinesService implements Mines {
 
 	private final List<Mine> mines = new ArrayList<>();
 	private final ThreadPoolExecutor executorService = (ThreadPoolExecutor) Executors
 			.newFixedThreadPool(30);
 	private final Plugin plugin = PluginUtils.getMainPlugin();
+
 	@Inject
 	private Container owner;
 	private DataStore folder;
@@ -77,7 +79,7 @@ public final class MinesService implements Mines {
 	private void autoRegen()
 	{
 		Bukkit.getScheduler()
-				.runTaskTimerAsynchronously(plugin, () -> this.getMines().forEach(this::regenerate), 0,
+				.runTaskTimerAsynchronously(this.plugin, () -> this.getMines().forEach(this::regenerate), 0,
 						1);
 	}
 
@@ -93,7 +95,7 @@ public final class MinesService implements Mines {
 		Bukkit.getScheduler().runTask(this.plugin, () ->
 		{
 			World world = ((CraftWorld) Bukkit.getWorld(region.getWorld())).getHandle();
-			Map<ChunkCords, ChunkSection[]> chunks = getChunks(world, min, max);
+			Map<ChunkCords, ChunkSection[]> chunks = this.getChunks(world, min, max);
 
 			this.executorService.submit(() ->
 			{
@@ -169,42 +171,16 @@ public final class MinesService implements Mines {
 		return chunks;
 	}
 
-	private final class ChunkCords {
+	private final class ChunkCords extends Bean {
 
-		private int x;
-		private int z;
+		private final int x;
+		private final int z;
 
 		ChunkCords(int x, int z)
 		{
 
 			this.x = x;
 			this.z = z;
-		}
-
-		@Override
-		public boolean equals(Object o)
-		{
-			if (this == o)
-			{
-				return true;
-			}
-
-			if (o == null || getClass() != o.getClass())
-			{
-				return false;
-			}
-
-			ChunkCords that = (ChunkCords) o;
-
-			return this.x == that.x && this.z == that.z;
-		}
-
-		@Override
-		public int hashCode()
-		{
-			int result = x;
-			result = 31 * result + z;
-			return result;
 		}
 
 	}

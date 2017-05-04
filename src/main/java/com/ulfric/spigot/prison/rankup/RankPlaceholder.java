@@ -1,11 +1,12 @@
 package com.ulfric.spigot.prison.rankup;
 
-import com.ulfric.commons.naming.Name;
-import com.ulfric.commons.spigot.text.placeholder.PlayerPlaceholder;
 import org.bukkit.entity.Player;
 
+import com.ulfric.commons.naming.Name;
+import com.ulfric.commons.spigot.text.placeholder.PlayerPlaceholder;
+
 @Name("PLAYER_PRISON_RANK")
-public class RankPlaceholder implements PlayerPlaceholder {
+class RankPlaceholder implements PlayerPlaceholder {
 	
 	@Override
 	public String apply(Player player)

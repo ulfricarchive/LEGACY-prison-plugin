@@ -15,7 +15,7 @@ import com.ulfric.spigot.prison.metadata.PrisonMetadataDefaults;
 @Name("clearinventory")
 @Alias({"clearinv", "ci"})
 @Permission("clearinventory-use")
-public class ClearInventoryCommand implements Command {
+class ClearInventoryCommand implements Command {
 
 	@Argument(optional = true)
 	@Permission("clearinventory-others")

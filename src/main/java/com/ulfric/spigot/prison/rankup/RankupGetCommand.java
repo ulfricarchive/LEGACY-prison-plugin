@@ -1,5 +1,7 @@
 package com.ulfric.spigot.prison.rankup;
 
+import org.bukkit.entity.Player;
+
 import com.ulfric.commons.naming.Name;
 import com.ulfric.commons.spigot.command.Alias;
 import com.ulfric.commons.spigot.command.Context;
@@ -8,13 +10,12 @@ import com.ulfric.commons.spigot.command.Permission;
 import com.ulfric.commons.spigot.command.argument.Argument;
 import com.ulfric.commons.spigot.text.Text;
 import com.ulfric.spigot.prison.metadata.PrisonMetadataDefaults;
-import org.bukkit.entity.Player;
 
 @Name("get")
 @Alias("show")
 @Permission("rankup-show")
 @MustBePlayer
-public class RankupGetCommand extends RankupCommand {
+class RankupGetCommand extends RankupCommand {
 	 
 	@Argument(optional = true)
 	private Player player;

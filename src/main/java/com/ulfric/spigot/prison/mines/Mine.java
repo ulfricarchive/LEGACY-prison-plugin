@@ -57,8 +57,8 @@ public final class Mine extends Bean implements Named {
 	private final String name;
 	private final WeightedTable<MineBlock> blocks;
 
-	Mine(String region, String name,
-			List<MineBlock> mineBlocks)
+	private Mine(String region, String name,
+	             List<MineBlock> mineBlocks)
 	{
 		this.region = region;
 		this.name = name;
