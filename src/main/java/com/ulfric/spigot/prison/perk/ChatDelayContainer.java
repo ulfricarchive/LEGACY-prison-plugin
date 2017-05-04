@@ -41,7 +41,7 @@ class ChatDelayContainer extends Container {
 		{
 			DataStore dataStore = Data.getDataStore(this.owner).getDataStore("chat-delay");
 
-			this.delay = dataStore.getData("chat").getInt("chat-delay");
+			this.delay = dataStore.getDefault().getInt("chat-delay");
 		}
 
 		@EventHandler(ignoreCancelled = true)
