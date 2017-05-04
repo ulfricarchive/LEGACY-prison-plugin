@@ -1,4 +1,4 @@
-package com.ulfric.spigot.prison.command;
+package com.ulfric.spigot.prison.essentials;
 
 import com.ulfric.commons.naming.Name;
 import com.ulfric.commons.spigot.command.Alias;
@@ -12,18 +12,17 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 @Name("nightvision")
-@Alias("nv")
+@Alias({"nightvis", "nightv", "nvision", "nvis", "nv", "nitevision", "nitevis", "nitev"})
 @Permission("nightvision-use")
 @MustBePlayer
-public class CommandNightVision implements Command
-{
+public class NightVisionCommand implements Command {
 
 	@Override
 	public void run(Context context)
 	{
 		Player player = (Player) context.getSender();
 
-		if(player.hasPotionEffect(PotionEffectType.NIGHT_VISION))
+		if (player.hasPotionEffect(PotionEffectType.NIGHT_VISION))
 		{
 			player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
@@ -35,7 +34,6 @@ public class CommandNightVision implements Command
 
 			Text.getService().sendMessage(player, "nightvision-use-on");
 		}
-
 	}
 
 }

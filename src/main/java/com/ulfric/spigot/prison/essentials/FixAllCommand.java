@@ -1,4 +1,4 @@
-package com.ulfric.spigot.prison.command;
+package com.ulfric.spigot.prison.essentials;
 
 import com.ulfric.commons.naming.Name;
 import com.ulfric.commons.spigot.command.Context;
@@ -18,34 +18,34 @@ import java.time.Instant;
 @Name("all")
 @Permission("fix-all-use")
 @MustBePlayer
-public class CommandFixAll extends CommandFix {
-	
+public class FixAllCommand extends FixCommand {
+
 	private static final String COOLDOWN_NAME = "COMMAND_FIX_ALL";
-	
+
 	@Override
 	public void run(Context context)
 	{
 		Player player = (Player) context.getSender();
-		
+
 		CooldownAccount account = Cooldowns.getService().getAccount(player.getUniqueId());
-		
-		if (account.isCooldown(CommandFixAll.COOLDOWN_NAME))
+
+		if (account.isCooldown(FixAllCommand.COOLDOWN_NAME))
 		{
-			Cooldown cooldown = account.getCooldown(CommandFixAll.COOLDOWN_NAME);
+			Cooldown cooldown = account.getCooldown(FixAllCommand.COOLDOWN_NAME);
 			Instant remaining = cooldown.getRemaining();
 			Text.getService().sendMessage(player, "fix-all-cooldown", PrisonMetadataDefaults.LAST_FIX_ALL_COOLDOWN, this.format(remaining));
 			return;
 		}
-		
+
 		boolean repaired = this.repair(player.getInventory());
-		
+
 		if (repaired)
 		{
 			player.updateInventory();
 			
 			Cooldown cooldown = Cooldown.builder()
 					.setUniqueId(player.getUniqueId())
-					.setName(CommandFixAll.COOLDOWN_NAME)
+					.setName(FixAllCommand.COOLDOWN_NAME)
 					.setStart(Instant.now())
 					.setExpiry(this.getExpiry())
 					.build();
@@ -54,13 +54,13 @@ public class CommandFixAll extends CommandFix {
 			
 			Text.getService().sendMessage(player, "fix-all");
 		}
+
 		else
 		{
 			Text.getService().sendMessage(player, "fix-all-invalid-items");
 		}
-		
 	}
-	
+
 	private boolean repair(Inventory inventory)
 	{
 		boolean repaired = false;
@@ -76,11 +76,11 @@ public class CommandFixAll extends CommandFix {
 		
 		return repaired;
 	}
-	
+
 	private Instant getExpiry()
 	{
 		// todo: need to talk to packet
 		return Instant.now();
 	}
-	
+
 }

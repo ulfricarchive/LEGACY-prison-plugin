@@ -1,4 +1,4 @@
-package com.ulfric.spigot.prison.command;
+package com.ulfric.spigot.prison.essentials;
 
 import com.ulfric.commons.naming.Name;
 import com.ulfric.commons.spigot.command.Context;
@@ -17,7 +17,7 @@ import java.time.Instant;
 @Name("hand")
 @Permission("fix-hand-use")
 @MustBePlayer
-public class CommandFixHand extends CommandFix {
+public class FixHandCommand extends FixCommand {
 	
 	private static final String COOLDOWN_NAME = "COMMAND_FIX_HAND";
 	
@@ -36,9 +36,9 @@ public class CommandFixHand extends CommandFix {
 		
 		CooldownAccount account = Cooldowns.getService().getAccount(player.getUniqueId());
 		
-		if (account.isCooldown(CommandFixHand.COOLDOWN_NAME))
+		if (account.isCooldown(FixHandCommand.COOLDOWN_NAME))
 		{
-			Cooldown cooldown = account.getCooldown(CommandFixHand.COOLDOWN_NAME);
+			Cooldown cooldown = account.getCooldown(FixHandCommand.COOLDOWN_NAME);
 			Instant remaining = cooldown.getRemaining();
 			Text.getService().sendMessage(player, "fix-hand-cooldown", PrisonMetadataDefaults.LAST_FIX_HAND_COOLDOWN, this.format(remaining));
 			return;
@@ -46,7 +46,7 @@ public class CommandFixHand extends CommandFix {
 		
 		Cooldown cooldown = Cooldown.builder()
 				.setUniqueId(player.getUniqueId())
-				.setName(CommandFixHand.COOLDOWN_NAME)
+				.setName(FixHandCommand.COOLDOWN_NAME)
 				.setStart(Instant.now())
 				.setExpiry(this.getExpiry())
 				.build();
@@ -58,10 +58,10 @@ public class CommandFixHand extends CommandFix {
 		
 		Text.getService().sendMessage(player, "fix-hand");
 	}
-	
+
 	private Instant getExpiry()
 	{
-		// todo: need to talk to packet
+		// TODO configurable
 		return Instant.now();
 	}
 

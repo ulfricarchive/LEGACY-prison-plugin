@@ -1,4 +1,4 @@
-package com.ulfric.spigot.prison.command;
+package com.ulfric.spigot.prison.essentials;
 
 import com.ulfric.commons.naming.Name;
 import com.ulfric.commons.spigot.command.Command;
@@ -15,19 +15,20 @@ import java.util.concurrent.TimeUnit;
 @Name("fix")
 @Permission("fix-use")
 @MustBePlayer
-public class CommandFix implements Command {
-	
+public class FixCommand implements Command {
+
 	@Override
 	public void run(Context context)
 	{
 		Text.getService().sendMessage(context.getSender(), "fix-use-help");
 	}
-	
+
 	final boolean isFixable(ItemStack itemStack)
 	{
 		return itemStack != null && itemStack.getType() != Material.AIR && itemStack.getDurability() != 0;
 	}
-	
+
+	// TODO static utility
 	final String format(Instant instant)
 	{
 		long milliseconds = instant.toEpochMilli();
@@ -50,5 +51,5 @@ public class CommandFix implements Command {
 		builder.append(String.valueOf(TimeUnit.MILLISECONDS.toSeconds(milliseconds) % 60)).append("s");
 		return builder.toString();
 	}
-	
+
 }

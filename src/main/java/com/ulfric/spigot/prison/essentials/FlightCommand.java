@@ -1,18 +1,20 @@
-package com.ulfric.spigot.prison.command;
+package com.ulfric.spigot.prison.essentials;
+
+import org.bukkit.entity.Player;
 
 import com.ulfric.commons.naming.Name;
+import com.ulfric.commons.spigot.command.Alias;
 import com.ulfric.commons.spigot.command.Command;
 import com.ulfric.commons.spigot.command.Context;
 import com.ulfric.commons.spigot.command.MustBePlayer;
 import com.ulfric.commons.spigot.command.Permission;
 import com.ulfric.commons.spigot.text.Text;
-import org.bukkit.entity.Player;
 
-@Name("fly")
-@Permission("fly-use")
+@Name("flight")
+@Alias({"float", "fly", "hover"})
+@Permission("flight-use")
 @MustBePlayer
-public class CommandFly implements Command
-{
+public class FlightCommand implements Command {
 
     @Override
     public void run(Context context)
@@ -24,7 +26,7 @@ public class CommandFly implements Command
         player.setAllowFlight(status);
         player.setFlying(status);
 
-        Text.getService().sendMessage(player, status ? "fly-use-on" : "fly-use-off");
+        Text.getService().sendMessage(player, status ? "flight-enabled" : "flight-disabled");
     }
 
 }

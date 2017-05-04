@@ -1,4 +1,4 @@
-package com.ulfric.spigot.prison.command;
+package com.ulfric.spigot.prison.essentials;
 
 import com.ulfric.commons.naming.Name;
 import com.ulfric.commons.spigot.command.MustBePlayer;
@@ -12,8 +12,7 @@ import org.bukkit.entity.Player;
 @Alias("ec")
 @Permission("enderchest-use")
 @MustBePlayer
-public class CommandEnderchest implements Command
-{
+public class EnderchestCommand implements Command {
 
 	@Override
 	public void run(Context context)

@@ -1,4 +1,4 @@
-package com.ulfric.spigot.prison.command;
+package com.ulfric.spigot.prison.essentials;
 
 import com.ulfric.commons.naming.Name;
 import com.ulfric.commons.spigot.command.Command;
@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 @Name("sun")
 @Permission("sun-use")
 @MustBePlayer
-public class CommandSun implements Command {
+public class SunCommand implements Command {
 
 	@Override
 	public void run(Context context)

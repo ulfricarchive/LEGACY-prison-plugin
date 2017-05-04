@@ -1,4 +1,4 @@
-package com.ulfric.spigot.prison.command;
+package com.ulfric.spigot.prison.essentials;
 
 import com.ulfric.commons.naming.Name;
 import com.ulfric.commons.spigot.command.Command;
@@ -20,7 +20,7 @@ import java.util.Objects;
 @Name("blocks")
 @Permission("blocks-use")
 @MustBePlayer
-public class CommandBlocks implements Command {
+public class BlocksCommand implements Command {
 	
 	private static final String BLOCKS_USE_ALL_PERMISSION = "blocks-use-all";
 	
@@ -108,7 +108,7 @@ public class CommandBlocks implements Command {
 	
 	private boolean isAllowed(Player player, Translation translation)
 	{
-		return player.hasPermission(CommandBlocks.BLOCKS_USE_ALL_PERMISSION) || player.hasPermission(translation.getPermission());
+		return player.hasPermission(BlocksCommand.BLOCKS_USE_ALL_PERMISSION) || player.hasPermission(translation.getPermission());
 	}
 	
 	private enum Translation {
