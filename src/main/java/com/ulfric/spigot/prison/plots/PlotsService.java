@@ -7,9 +7,15 @@ import com.ulfric.dragoon.initialize.Initialize;
 import com.ulfric.dragoon.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 
-public class PlotsService implements Plots {
+public class PlotsService implements Plots, Listener {
 
 	List<Plot> plots = new ArrayList<>();
 
@@ -19,16 +25,20 @@ public class PlotsService implements Plots {
 	@Initialize
 	private void initialize()
 	{
-		for (int i = 0; i < 20; i++)
-		{
-			generate(10);
-		}
+	}
+
+	@EventHandler
+	public void test(PlayerInteractEvent event)
+	{
+		generate(10);
 	}
 
 	private void generate(int sideLength)
 	{
 		Plot plot = null;
 		List<Point> bases = base();
+		World world = Bukkit.getWorld("world");
+		world.setAutoSave(false);
 		if (plots.size() > 0)
 		{
 			for (Point base : bases)
@@ -39,17 +49,15 @@ public class PlotsService implements Plots {
 				}
 				for (Vector direction : Plot.DIRECTIONS)
 				{
-					if (plot(base, direction) == null)
+					plot = new Plot(base, direction, sideLength);
+					if (plot(base, direction) == null
+							&& plot(plot.max(), direction.clone().multiply(-1)) == null)
 					{
-						plot = new Plot(base, direction, sideLength);
-						if (bases.contains(plot.max()))
-						{
-							plot = null;
-						}
-						else
-						{
-							break;
-						}
+						break;
+					}
+					else
+					{
+						plot = null;
 					}
 				}
 			}
@@ -60,6 +68,27 @@ public class PlotsService implements Plots {
 		}
 		if (plot != null)
 		{
+			Vector direction = plot.getDirection();
+			Point min = PointUtils.multiply(plot.getBase(), direction);
+			Point max = PointUtils.multiply(plot.max(), direction);
+			for (int x = min.getX(); x <= max.getX(); x++)
+			{
+				if (x == min.getX() || x == max.getX())
+				{
+					for (int z = min.getZ(); z <= max.getZ(); z++)
+					{
+						world.getBlockAt((int) (x * direction.getX()), 3, (int) (z * direction.getZ()))
+								.setType(Material.DIAMOND_BLOCK);
+					}
+				}
+				else
+				{
+					world.getBlockAt((int) (x * direction.getX()), 3, (int) (min.getZ() * direction.getZ()))
+							.setType(Material.DIAMOND_BLOCK);
+					world.getBlockAt((int) (x * direction.getX()), 3, (int) (max.getZ() * direction.getZ()))
+							.setType(Material.DIAMOND_BLOCK);
+				}
+			}
 			plots.add(plot);
 		}
 	}
