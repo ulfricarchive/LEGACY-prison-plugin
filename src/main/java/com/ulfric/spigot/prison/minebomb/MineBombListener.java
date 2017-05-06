@@ -1,6 +1,6 @@
 package com.ulfric.spigot.prison.minebomb;
 
-import com.ulfric.commons.spigot.event.Events;
+import com.ulfric.commons.spigot.block.BlockUtils;
 import com.ulfric.commons.spigot.intercept.RequirePermission;
 import com.ulfric.commons.spigot.text.Text;
 import org.bukkit.Material;
@@ -9,11 +9,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashSet;
 import java.util.Set;
 
 class MineBombListener implements Listener {
@@ -58,41 +56,6 @@ class MineBombListener implements Listener {
 		return block;
 	}
 	
-	private Set<Block> getBlocks(Player player, Block origin, int radius)
-	{
-		Set<Block> blocks = new HashSet<>();
-		blocks.add(origin);
-		
-		int originX = origin.getX();
-		int originY = origin.getY();
-		int originZ = origin.getZ();
-		
-		for (int x = originX - radius; x <= originX + radius; x++)
-		{
-			for (int y = originY - radius; y <= originY + radius; y++)
-			{
-				for (int z = originZ - radius; z <= originZ + radius; z++)
-				{
-					Block current = origin.getWorld().getBlockAt(x, y, z);
-					
-					if (!this.isBreakable(player, current))
-					{
-						continue;
-					}
-					
-					blocks.add(current);
-				}
-			}
-		}
-		
-		return blocks;
-	}
-	
-	private boolean callFakeBreak(Player player, Block block)
-	{
-		return Events.fire(new BlockBreakEvent(block, player)).isCancelled();
-	}
-	
 	private boolean isValidBlock(Block block)
 	{
 		return block.getType() != Material.AIR;
@@ -100,7 +63,7 @@ class MineBombListener implements Listener {
 	
 	private boolean isBreakable(Player player, Block block)
 	{
-		return this.callFakeBreak(player, block) && this.isValidBlock(block);
+		return !BlockUtils.callArtificialBreak(player, block) && this.isValidBlock(block);
 	}
 	
 	private void handleBlockBreak(Player player, Set<Block> blocks)
@@ -114,7 +77,8 @@ class MineBombListener implements Listener {
 	
 	private void performMineBomb(Player player, int tier, Block origin)
 	{
-		Set<Block> blocks = this.getBlocks(player, origin, tier);
+		Set<Block> blocks = BlockUtils.getBlocks(origin, tier);
+		blocks.removeIf(block -> this.isBreakable(player, block));
 		
 		if (!this.validateMineBomb(player, origin, blocks))
 		{
@@ -128,7 +92,7 @@ class MineBombListener implements Listener {
 	
 	private boolean validateMineBomb(Player player, Block origin, Set<Block> blocks)
 	{
-		if (!this.callFakeBreak(player, origin))
+		if (!BlockUtils.callArtificialBreak(player, origin))
 		{
 			Text.getService().sendMessage(player, "minebomb-not-in-mine");
 			return false;

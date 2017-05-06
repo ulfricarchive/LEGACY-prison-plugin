@@ -1,4 +1,4 @@
-package com.ulfric.spigot.prison.minebomb;
+package com.ulfric.spigot.prison.minerocket;
 
 import com.ulfric.commons.naming.Name;
 import com.ulfric.commons.spigot.command.Context;
@@ -10,8 +10,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 @Name("give")
-@Permission("minebomb-give")
-class MineBombGiveCommand extends MineBombCommand {
+@Permission("minerocket-give")
+class MineRocketGiveCommand extends MineRocketCommand {
 	
 	@Argument
 	private Player target;
@@ -29,23 +29,23 @@ class MineBombGiveCommand extends MineBombCommand {
 		Player target = this.target;
 		int amount = this.amount == null ? 1 : this.amount;
 		
-		MineBombs mineBombs = MineBombs.getService();
+		MineRockets mineRockets = MineRockets.getService();
 		Text text = Text.getService();
 		
-		if (!mineBombs.isTier(this.tier))
+		if (!mineRockets.isTier(this.tier))
 		{
-			text.sendMessage(sender, "minebomb-invalid-tier");
+			text.sendMessage(sender, "minerocket-invalid-tier");
 			return;
 		}
 		
-		mineBombs.give(target, this.tier, amount);
+		mineRockets.give(target, this.tier, amount);
 		
-		text.sendMessage(sender, "minebomb-give",
-				PrisonMetadataDefaults.LAST_MINE_BOMB_GIVE_AMOUNT, String.valueOf(amount),
-				PrisonMetadataDefaults.LAST_MINE_BOMB_GIVE_USER, target.getName());
+		text.sendMessage(context.getSender(), "minerocket-give",
+				PrisonMetadataDefaults.LAST_MINE_ROCKET_GIVE_AMOUNT, String.valueOf(amount),
+				PrisonMetadataDefaults.LAST_MINE_ROCKET_GIVE_USER, target.getName());
 		
-		text.sendMessage(target, "minebomb-receive",
-				PrisonMetadataDefaults.LAST_MINE_BOMB_RECEIVE_AMOUNT, String.valueOf(amount));
+		text.sendMessage(target, "minerocket-receive",
+				PrisonMetadataDefaults.LAST_MINE_ROCKET_RECEIVE_AMOUNT, String.valueOf(amount));
 	}
 	
 }

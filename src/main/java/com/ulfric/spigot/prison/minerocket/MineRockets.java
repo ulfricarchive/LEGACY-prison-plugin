@@ -1,4 +1,4 @@
-package com.ulfric.spigot.prison.minebomb;
+package com.ulfric.spigot.prison.minerocket;
 
 import com.ulfric.commons.naming.Name;
 import com.ulfric.commons.service.Service;
@@ -16,35 +16,35 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 import java.util.Map;
 
-@Name("minebombs")
+@Name("minerockets")
 @Version(1)
-class MineBombs implements Service {
+class MineRockets implements Service {
 	
-	public static MineBombs getService()
+	public static MineRockets getService()
 	{
-		return ServiceUtils.getService(MineBombs.class);
+		return ServiceUtils.getService(MineRockets.class);
 	}
+	
+	private final Map<Integer, ItemStack> mineRockets = new HashMap<>();
 	
 	@Inject
 	private Container owner;
 	
-	private final Map<Integer, ItemStack> mineBombs = new HashMap<>();
-	
 	@Initialize
 	private void initialize()
 	{
-		PersistentData data = Data.getDataStore(this.owner).getData("mb-items");
-		data.getSections().forEach(this::loadMineBomb);
+		PersistentData data = Data.getDataStore(this.owner).getData("mr-items");
+		data.getSections().forEach(this::loadMineRocket);
 	}
 	
-	private void loadMineBomb(PersistentData data)
+	private void loadMineRocket(PersistentData data)
 	{
 		int tier = data.getInt("tier");
 		ItemStack itemStack = ItemParts.deserialize(data.getString("item"));
 		
 		if (itemStack != null)
 		{
-			this.mineBombs.putIfAbsent(tier, itemStack);
+			this.mineRockets.putIfAbsent(tier, itemStack);
 		}
 	}
 	
@@ -82,19 +82,19 @@ class MineBombs implements Service {
 	
 	public boolean isTier(int tier)
 	{
-		return this.mineBombs.containsKey(tier);
+		return this.mineRockets.containsKey(tier);
 	}
 	
 	public ItemStack getItem(int tier)
 	{
-		return this.mineBombs.get(tier);
+		return this.mineRockets.get(tier);
 	}
 	
 	public Integer getTier(ItemStack item)
 	{
-		for (Map.Entry<Integer, ItemStack> entry : this.mineBombs.entrySet())
+		for (Map.Entry<Integer, ItemStack> entry : this.mineRockets.entrySet())
 		{
-			if (entry.getValue().isSimilar(item))
+			if (item.isSimilar(entry.getValue()))
 			{
 				return entry.getKey();
 			}
