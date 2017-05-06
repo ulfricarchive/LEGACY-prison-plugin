@@ -18,6 +18,7 @@ import org.bukkit.util.Vector;
 public class PlotsService implements Plots, Listener {
 
 	List<Plot> plots = new ArrayList<>();
+	List<MergredPlot> mergredPlots = new ArrayList<>();
 
 	@Inject
 	private Container owner;
@@ -25,20 +26,50 @@ public class PlotsService implements Plots, Listener {
 	@Initialize
 	private void initialize()
 	{
+		World world = Bukkit.getWorld("world");
+		world.setAutoSave(false);
 	}
 
 	@EventHandler
 	public void test(PlayerInteractEvent event)
 	{
-		generate(10);
+		Plot plot = generate(20);
+		if (plot != null){
+			plots.add(plot);
+			outline(plot);
+		}
 	}
 
-	private void generate(int sideLength)
+	public void outline(Plot plot)
+	{
+		World world = Bukkit.getWorld("world");
+		Vector direction = plot.getDirection();
+		Point min = PointUtils.multiply(plot.getBase(), direction);
+		Point max = PointUtils.multiply(plot.max(), direction);
+		for (int x = min.getX(); x <= max.getX(); x++)
+		{
+			if (x == min.getX() || x == max.getX())
+			{
+				for (int z = min.getZ(); z <= max.getZ(); z++)
+				{
+					world.getBlockAt((int) (x * direction.getX()), 3, (int) (z * direction.getZ()))
+							.setType(Material.DIAMOND_BLOCK);
+				}
+			}
+			else
+			{
+				world.getBlockAt((int) (x * direction.getX()), 3, (int) (min.getZ() * direction.getZ()))
+						.setType(Material.DIAMOND_BLOCK);
+				world.getBlockAt((int) (x * direction.getX()), 3, (int) (max.getZ() * direction.getZ()))
+						.setType(Material.DIAMOND_BLOCK);
+			}
+		}
+	}
+
+	private Plot generate(int sideLength)
 	{
 		Plot plot = null;
-		List<Point> bases = base();
-		World world = Bukkit.getWorld("world");
-		world.setAutoSave(false);
+		List<Point> bases = sortPlots(Point.ZERO, plots);
 		if (plots.size() > 0)
 		{
 			for (Point base : bases)
@@ -66,31 +97,7 @@ public class PlotsService implements Plots, Listener {
 		{
 			plot = new Plot(Point.ZERO, Plot.DIRECTIONS[0], sideLength);
 		}
-		if (plot != null)
-		{
-			Vector direction = plot.getDirection();
-			Point min = PointUtils.multiply(plot.getBase(), direction);
-			Point max = PointUtils.multiply(plot.max(), direction);
-			for (int x = min.getX(); x <= max.getX(); x++)
-			{
-				if (x == min.getX() || x == max.getX())
-				{
-					for (int z = min.getZ(); z <= max.getZ(); z++)
-					{
-						world.getBlockAt((int) (x * direction.getX()), 3, (int) (z * direction.getZ()))
-								.setType(Material.DIAMOND_BLOCK);
-					}
-				}
-				else
-				{
-					world.getBlockAt((int) (x * direction.getX()), 3, (int) (min.getZ() * direction.getZ()))
-							.setType(Material.DIAMOND_BLOCK);
-					world.getBlockAt((int) (x * direction.getX()), 3, (int) (max.getZ() * direction.getZ()))
-							.setType(Material.DIAMOND_BLOCK);
-				}
-			}
-			plots.add(plot);
-		}
+		return plot;
 	}
 
 	public Plot plot(Point base, Vector direction)
@@ -105,7 +112,7 @@ public class PlotsService implements Plots, Listener {
 		return null;
 	}
 
-	public List<Point> base()
+	public List<Point> sortPlots(Point center, List<Plot> plots)
 	{
 		List<Point> bases = new ArrayList<>();
 		plots.stream().filter(plot -> !bases.contains(plot.getBase())).forEach(plot ->
