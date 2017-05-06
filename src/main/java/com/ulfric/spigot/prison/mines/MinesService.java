@@ -48,7 +48,7 @@ final class MinesService implements Mines {
 	{
 		this.folder = Data.getDataStore(this.owner).getDataStore("mines");
 		this.load();
-		this.autoRegen();
+//		this.autoRegen();
 	}
 
 	private void load()
@@ -80,7 +80,7 @@ final class MinesService implements Mines {
 	{
 		Bukkit.getScheduler()
 				.runTaskTimerAsynchronously(this.plugin, () -> this.getMines().forEach(this::regenerate), 0,
-						1);
+						0);
 	}
 
 	@Override
