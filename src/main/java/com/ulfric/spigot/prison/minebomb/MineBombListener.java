@@ -77,7 +77,7 @@ class MineBombListener implements Listener {
 	
 	private void performMineBomb(Player player, int tier, Block origin)
 	{
-		Set<Block> blocks = BlockUtils.getBlocks(origin, tier);
+		Set<Block> blocks = BlockUtils.getBlocksWithinRadius(origin, tier);
 		blocks.add(origin);
 		blocks.removeIf(block -> this.isBreakable(player, block));
 		

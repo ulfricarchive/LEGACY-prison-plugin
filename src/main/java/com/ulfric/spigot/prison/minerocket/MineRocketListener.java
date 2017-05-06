@@ -62,7 +62,7 @@ class MineRocketListener implements Listener {
 	
 	private void performMineRocket(Player player, Block origin, int tier)
 	{
-		Set<Block> blocks = BlockUtils.getBlocks(origin, tier);
+		Set<Block> blocks = BlockUtils.getBlocksWithinRadius(origin, tier);
 		blocks.add(origin);
 		blocks.removeIf(block -> !this.isBreakable(player, block));
 		
