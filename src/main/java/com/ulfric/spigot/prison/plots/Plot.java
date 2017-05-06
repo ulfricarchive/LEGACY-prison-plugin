@@ -8,8 +8,8 @@ import org.bukkit.util.Vector;
 
 public class Plot extends Bean {
 
-	public static final Vector[] DIRECTIONS = new Vector[]{new Vector(1, 1, 0), new Vector(-1, 1, 0),
-			new Vector(1, -1, 0), new Vector(-1, -1, 0)};
+	public static final Vector[] DIRECTIONS = new Vector[]{new Vector(1, 0, 1), new Vector(-1, 0, 1),
+			new Vector(1, 0, -1), new Vector(-1, 0, -1)};
 	private final Point base;
 	private final Vector direction;
 	private final int sideLength;
@@ -38,7 +38,7 @@ public class Plot extends Bean {
 
 	public Point max()
 	{
-		return PointUtils.add(base, direction.multiply(sideLength));
+		return PointUtils.add(base, direction.clone().multiply(sideLength));
 	}
 
 }
