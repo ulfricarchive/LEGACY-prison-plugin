@@ -36,17 +36,17 @@ public class Plot extends Bean {
 		return sideLength;
 	}
 
-	Point getXZPoint()
+	Point getFurthestXZ()
 	{
 		return PointUtils.add(base, direction.clone().multiply(sideLength));
 	}
 
-	Point getXPoint()
+	Point getFurthestX()
 	{
 		return PointUtils.add(base, direction.clone().multiply(sideLength).setZ(0));
 	}
 
-	Point getZPoint()
+	Point getFurthestZ()
 	{
 		return PointUtils.add(base, direction.clone().multiply(sideLength).setX(0));
 	}

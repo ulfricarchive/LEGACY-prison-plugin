@@ -50,7 +50,7 @@ public class PlotsService implements Plots, Listener {
 		World world = Bukkit.getWorld("world");
 		Vector direction = plot.getDirection();
 		Point min = PointUtils.multiply(plot.getBase(), direction);
-		Point max = PointUtils.multiply(plot.getXZPoint(), direction);
+		Point max = PointUtils.multiply(plot.getFurthestXZ(), direction);
 		for (int x = min.getX(); x <= max.getX(); x++)
 		{
 			if (x == min.getX() || x == max.getX())
@@ -121,11 +121,11 @@ public class PlotsService implements Plots, Listener {
 
 	private boolean checkCombinations(Plot plot)
 	{
-		Plot plotX = new Plot(plot.getXPoint(),
+		Plot plotX = new Plot(plot.getFurthestX(),
 				plot.getDirection().clone().multiply(new Vector(-1, 0, 1)), plot.getSideLength());
-		Plot plotZ = new Plot(plot.getZPoint(),
+		Plot plotZ = new Plot(plot.getFurthestZ(),
 				plot.getDirection().clone().multiply(new Vector(1, 0, -1)), plot.getSideLength());
-		Plot plotXZ = new Plot(plot.getXZPoint(), plot.getDirection().clone().multiply(-1),
+		Plot plotXZ = new Plot(plot.getFurthestXZ(), plot.getDirection().clone().multiply(-1),
 				plot.getSideLength());
 		for (Plot plot1 : plots)
 		{
@@ -159,9 +159,9 @@ public class PlotsService implements Plots, Listener {
 			{
 				bases.add(plot.getBase());
 			}
-			if (!bases.contains(plot.getXZPoint()))
+			if (!bases.contains(plot.getFurthestXZ()))
 			{
-				bases.add(plot.getXZPoint());
+				bases.add(plot.getFurthestXZ());
 			}
 		}
 		bases.sort((o1, o2) ->
