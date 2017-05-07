@@ -8,37 +8,47 @@ import org.bukkit.util.Vector;
 
 public class Plot extends Bean {
 
-	public static final Vector[] DIRECTIONS = new Vector[]{new Vector(1, 0, 1), new Vector(-1, 0, 1),
+	static final Vector[] DIRECTIONS = new Vector[]{new Vector(1, 0, 1), new Vector(-1, 0, 1),
 			new Vector(1, 0, -1), new Vector(-1, 0, -1)};
 	private final Point base;
 	private final Vector direction;
 	private final int sideLength;
 
-	public Plot(Point base, Vector direction, int sideLength)
+	Plot(Point base, Vector direction, int sideLength)
 	{
 		this.base = base;
 		this.direction = direction;
 		this.sideLength = sideLength;
 	}
 
-	public Point getBase()
+	Point getBase()
 	{
 		return base;
 	}
 
-	public Vector getDirection()
+	Vector getDirection()
 	{
 		return direction;
 	}
 
-	public int getSideLength()
+	int getSideLength()
 	{
 		return sideLength;
 	}
 
-	public Point max()
+	Point getXZPoint()
 	{
 		return PointUtils.add(base, direction.clone().multiply(sideLength));
+	}
+
+	Point getXPoint()
+	{
+		return PointUtils.add(base, direction.clone().multiply(sideLength).setZ(0));
+	}
+
+	Point getZPoint()
+	{
+		return PointUtils.add(base, direction.clone().multiply(sideLength).setX(0));
 	}
 
 }

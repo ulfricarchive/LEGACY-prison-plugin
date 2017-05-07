@@ -1,12 +1,15 @@
 package com.ulfric.spigot.prison.plots;
 
+import com.ulfric.commons.spigot.plugin.PluginUtils;
 import com.ulfric.commons.spigot.point.PointUtils;
 import com.ulfric.commons.spigot.shape.Point;
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;
 import com.ulfric.dragoon.inject.Inject;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -17,8 +20,7 @@ import org.bukkit.util.Vector;
 
 public class PlotsService implements Plots, Listener {
 
-	List<Plot> plots = new ArrayList<>();
-	List<MergredPlot> mergredPlots = new ArrayList<>();
+	private List<Plot> plots = new CopyOnWriteArrayList<>();
 
 	@Inject
 	private Container owner;
@@ -28,24 +30,27 @@ public class PlotsService implements Plots, Listener {
 	{
 		World world = Bukkit.getWorld("world");
 		world.setAutoSave(false);
+		Bukkit.getScheduler().runTaskTimerAsynchronously(PluginUtils.getMainPlugin(), () ->
+		{
+			long start = System.currentTimeMillis();
+			Plot plot = generatePlot(3);
+			System.out.println(System.currentTimeMillis() - start);
+			plots.add(plot);
+		}, 0, 2);
 	}
 
 	@EventHandler
 	public void test(PlayerInteractEvent event)
 	{
-		Plot plot = generate(20);
-		if (plot != null){
-			plots.add(plot);
-			outline(plot);
-		}
+		plots.forEach(this::outline);
 	}
 
-	public void outline(Plot plot)
+	private void outline(Plot plot)
 	{
 		World world = Bukkit.getWorld("world");
 		Vector direction = plot.getDirection();
 		Point min = PointUtils.multiply(plot.getBase(), direction);
-		Point max = PointUtils.multiply(plot.max(), direction);
+		Point max = PointUtils.multiply(plot.getXZPoint(), direction);
 		for (int x = min.getX(); x <= max.getX(); x++)
 		{
 			if (x == min.getX() || x == max.getX())
@@ -66,10 +71,12 @@ public class PlotsService implements Plots, Listener {
 		}
 	}
 
-	private Plot generate(int sideLength)
+	private HashSet<Point> failedBases = new HashSet<>();
+
+	private Plot generatePlot(int sideLength)
 	{
 		Plot plot = null;
-		List<Point> bases = sortPlots(Point.ZERO, plots);
+		List<Point> bases = sortPlotsByRadius(Point.ZERO, plots);
 		if (plots.size() > 0)
 		{
 			for (Point base : bases)
@@ -78,11 +85,14 @@ public class PlotsService implements Plots, Listener {
 				{
 					break;
 				}
+				if (failedBases.contains(base))
+				{
+					continue;
+				}
 				for (Vector direction : Plot.DIRECTIONS)
 				{
 					plot = new Plot(base, direction, sideLength);
-					if (plot(base, direction) == null
-							&& plot(plot.max(), direction.clone().multiply(-1)) == null)
+					if (checkCombinations(plot))
 					{
 						break;
 					}
@@ -90,6 +100,9 @@ public class PlotsService implements Plots, Listener {
 					{
 						plot = null;
 					}
+				}
+				if (plot == null){
+					failedBases.add(base);
 				}
 			}
 		}
@@ -100,7 +113,32 @@ public class PlotsService implements Plots, Listener {
 		return plot;
 	}
 
-	public Plot plot(Point base, Vector direction)
+	private boolean checkBaseDir(Plot plot, Plot plot1)
+	{
+		return plot1.getBase().equals(plot.getBase()) && plot1.getDirection()
+				.equals(plot.getDirection());
+	}
+
+	private boolean checkCombinations(Plot plot)
+	{
+		Plot plotX = new Plot(plot.getXPoint(),
+				plot.getDirection().clone().multiply(new Vector(-1, 0, 1)), plot.getSideLength());
+		Plot plotZ = new Plot(plot.getZPoint(),
+				plot.getDirection().clone().multiply(new Vector(1, 0, -1)), plot.getSideLength());
+		Plot plotXZ = new Plot(plot.getXZPoint(), plot.getDirection().clone().multiply(-1),
+				plot.getSideLength());
+		for (Plot plot1 : plots)
+		{
+			if (checkBaseDir(plot1, plot) || checkBaseDir(plot1, plotX) || checkBaseDir(plot1, plotZ)
+					|| checkBaseDir(plot1, plotXZ))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public Plot getPlot(Point base, Vector direction)
 	{
 		for (Plot plot : plots)
 		{
@@ -112,17 +150,24 @@ public class PlotsService implements Plots, Listener {
 		return null;
 	}
 
-	public List<Point> sortPlots(Point center, List<Plot> plots)
+	private List<Point> sortPlotsByRadius(Point center, List<Plot> plots)
 	{
 		List<Point> bases = new ArrayList<>();
-		plots.stream().filter(plot -> !bases.contains(plot.getBase())).forEach(plot ->
-				bases.add(plot.getBase()));
-		plots.stream().filter(plot -> !bases.contains(plot.max())).forEach(plot ->
-				bases.add(plot.max()));
+		for (Plot plot : plots)
+		{
+			if (!bases.contains(plot.getBase()))
+			{
+				bases.add(plot.getBase());
+			}
+			if (!bases.contains(plot.getXZPoint()))
+			{
+				bases.add(plot.getXZPoint());
+			}
+		}
 		bases.sort((o1, o2) ->
 		{
-			double d1 = PointUtils.substract(Point.ZERO, o1).length();
-			double d2 = PointUtils.substract(Point.ZERO, o2).length();
+			double d1 = PointUtils.substract(center, o1).length();
+			double d2 = PointUtils.substract(center, o2).length();
 			return Double.compare(d1, d2);
 		});
 		return bases;
