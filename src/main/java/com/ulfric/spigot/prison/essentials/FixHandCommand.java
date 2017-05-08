@@ -1,6 +1,7 @@
 package com.ulfric.spigot.prison.essentials;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -164,8 +165,9 @@ class FixHandCommand extends FixCommand {
 					collect(Collectors.toList()).
 						stream().
 							mapToLong(this.cooldowns::get).
-							sorted().
-							findFirst().orElse(-1);
+							boxed().
+							sorted(Collections.reverseOrder()).
+							findFirst().orElse(-1L);
 	}
 	
 }
