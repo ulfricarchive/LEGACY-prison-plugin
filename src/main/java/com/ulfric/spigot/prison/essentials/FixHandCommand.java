@@ -2,6 +2,7 @@ package com.ulfric.spigot.prison.essentials;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.ulfric.commons.spigot.data.Data;
 import com.ulfric.commons.spigot.data.DataSection;
@@ -157,14 +158,14 @@ class FixHandCommand extends FixCommand {
 	
 	private long identifyCooldownLength(Player player)
 	{
-		String permission = this.cooldowns.keySet().stream().filter(player::hasPermission).findFirst().orElse(null);
-		
-		if (permission == null)
-		{
-			return -1;
-		}
-		
-		return this.cooldowns.get(permission);
+		return this.cooldowns.keySet().
+				stream().
+					filter(player::hasPermission).
+					collect(Collectors.toList()).
+						stream().
+							mapToLong(this.cooldowns::get).
+							sorted().
+							findFirst().orElse(-1);
 	}
-
+	
 }
