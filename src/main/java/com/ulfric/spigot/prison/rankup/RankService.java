@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import com.ulfric.commons.identity.Identifiable;
 import com.ulfric.commons.identity.Identity;
 import com.ulfric.commons.spigot.data.Data;
+import com.ulfric.commons.spigot.data.DataSection;
 import com.ulfric.commons.spigot.data.DataStore;
 import com.ulfric.commons.spigot.data.PersistentData;
 import com.ulfric.commons.spigot.economy.CurrencyAmount;
@@ -50,7 +51,7 @@ public class RankService implements Ranks {
 		data.getSections().forEach(this::loadRank);
 	}
 	
-	private void loadRank(PersistentData data)
+	private void loadRank(DataSection data)
 	{
 		String name = this.loadRankName(data);
 		
@@ -62,7 +63,7 @@ public class RankService implements Ranks {
 		this.ranks.put(rank.getName(), rank);
 	}
 	
-	private String loadRankName(PersistentData data)
+	private String loadRankName(DataSection data)
 	{
 		String name = data.getString("name");
 		return name == null ? data.getName() : name;

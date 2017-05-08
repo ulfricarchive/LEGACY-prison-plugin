@@ -1,8 +1,15 @@
 package com.ulfric.spigot.prison.minerocket;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
 import com.ulfric.commons.naming.Name;
 import com.ulfric.commons.service.Service;
 import com.ulfric.commons.spigot.data.Data;
+import com.ulfric.commons.spigot.data.DataSection;
 import com.ulfric.commons.spigot.data.PersistentData;
 import com.ulfric.commons.spigot.item.parts.ItemParts;
 import com.ulfric.commons.spigot.service.ServiceUtils;
@@ -10,11 +17,6 @@ import com.ulfric.commons.version.Version;
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;
 import com.ulfric.dragoon.inject.Inject;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Name("minerockets")
 @Version(1)
@@ -37,7 +39,7 @@ class MineRockets implements Service {
 		data.getSections().forEach(this::loadMineRocket);
 	}
 	
-	private void loadMineRocket(PersistentData data)
+	private void loadMineRocket(DataSection data)
 	{
 		int tier = data.getInt("tier");
 		ItemStack itemStack = ItemParts.deserialize(data.getString("item"));
