@@ -1,7 +1,15 @@
 package com.ulfric.spigot.prison.essentials;
 
 import java.time.Instant;
+import java.util.Map;
 
+import com.ulfric.commons.spigot.data.Data;
+import com.ulfric.commons.spigot.data.DataSection;
+import com.ulfric.commons.spigot.data.PersistentData;
+import com.ulfric.dragoon.container.Container;
+import com.ulfric.dragoon.initialize.Initialize;
+import com.ulfric.dragoon.inject.Inject;
+import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -22,6 +30,30 @@ import com.ulfric.spigot.prison.metadata.PrisonMetadataDefaults;
 class FixAllCommand extends FixCommand {
 
 	private static final String COOLDOWN_NAME = "COMMAND_FIX_ALL";
+	
+	@Inject
+	private Container owner;
+	
+	private final Map<String, Long> cooldowns = new CaseInsensitiveMap<>();
+	
+	@Initialize
+	private void initialize()
+	{
+		PersistentData data = Data.getDataStore(this.owner).getDataStore("fix-command").getDefault();
+		this.loadCooldowns(data);
+	}
+	
+	private void loadCooldowns(PersistentData data)
+	{
+		data.getSection("fix-all").getSections().forEach(this::loadCooldown);
+	}
+	
+	private void loadCooldown(DataSection section)
+	{
+		String permission = section.getString("permission");
+		long cooldown = section.getLong("cooldown");
+		this.cooldowns.put(permission, cooldown);
+	}
 
 	@Override
 	public void run(Context context)
@@ -44,14 +76,19 @@ class FixAllCommand extends FixCommand {
 		{
 			player.updateInventory();
 			
-			Cooldown cooldown = Cooldown.builder()
-					.setUniqueId(player.getUniqueId())
-					.setName(FixAllCommand.COOLDOWN_NAME)
-					.setStart(Instant.now())
-					.setExpiry(this.getExpiry())
-					.build();
+			Instant expiry = this.getExpiry(player);
 			
-			account.setCooldown(cooldown);
+			if (expiry != null)
+			{
+				Cooldown cooldown = Cooldown.builder()
+						.setUniqueId(player.getUniqueId())
+						.setName(FixAllCommand.COOLDOWN_NAME)
+						.setStart(Instant.now())
+						.setExpiry(expiry)
+						.build();
+				
+				account.setCooldown(cooldown);
+			}
 			
 			Text.getService().sendMessage(player, "fix-all");
 		}
@@ -78,10 +115,28 @@ class FixAllCommand extends FixCommand {
 		return repaired;
 	}
 
-	private Instant getExpiry()
+	private Instant getExpiry(Player player)
 	{
-		// todo: need to talk to packet
-		return Instant.now();
+		long cooldown = this.identifyCooldownLength(player);
+		
+		if (cooldown == -1)
+		{
+			return null;
+		}
+		
+		return Instant.now().plusMillis(cooldown);
+	}
+	
+	private long identifyCooldownLength(Player player)
+	{
+		String permission = this.cooldowns.keySet().stream().filter(player::hasPermission).findFirst().orElse(null);
+		
+		if (permission == null)
+		{
+			return -1;
+		}
+		
+		return this.cooldowns.get(permission);
 	}
 
 }

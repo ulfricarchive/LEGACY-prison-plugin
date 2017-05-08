@@ -1,7 +1,16 @@
 package com.ulfric.spigot.prison.essentials;
 
 import java.time.Instant;
+import java.util.Map;
 
+import com.ulfric.commons.spigot.data.Data;
+import com.ulfric.commons.spigot.data.DataSection;
+import com.ulfric.commons.spigot.data.DataStore;
+import com.ulfric.commons.spigot.data.PersistentData;
+import com.ulfric.dragoon.container.Container;
+import com.ulfric.dragoon.initialize.Initialize;
+import com.ulfric.dragoon.inject.Inject;
+import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -21,6 +30,30 @@ import com.ulfric.spigot.prison.metadata.PrisonMetadataDefaults;
 class FixHandCommand extends FixCommand {
 	
 	private static final String COOLDOWN_NAME = "COMMAND_FIX_HAND";
+	
+	@Inject
+	private Container owner;
+	
+	private final Map<String, Long> cooldowns = new CaseInsensitiveMap<>();
+	
+	@Initialize
+	private void initialize()
+	{
+		PersistentData data = Data.getDataStore(this.owner).getDataStore("fix-command").getDefault();
+		this.loadCooldowns(data);
+	}
+	
+	private void loadCooldowns(PersistentData data)
+	{
+		data.getSection("fix-hand").getSections().forEach(this::loadCooldown);
+	}
+	
+	private void loadCooldown(DataSection section)
+	{
+		String permission = section.getString("permission");
+		long cooldown = section.getLong("cooldown");
+		this.cooldowns.putIfAbsent(permission, cooldown);
+	}
 	
 	@Override
 	public void run(Context context)
@@ -45,14 +78,19 @@ class FixHandCommand extends FixCommand {
 			return;
 		}
 		
-		Cooldown cooldown = Cooldown.builder()
-				.setUniqueId(player.getUniqueId())
-				.setName(FixHandCommand.COOLDOWN_NAME)
-				.setStart(Instant.now())
-				.setExpiry(this.getExpiry())
-				.build();
+		Instant expiry = this.getExpiry(player);
 		
-		account.setCooldown(cooldown);
+		if (expiry != null)
+		{
+			Cooldown cooldown = Cooldown.builder()
+					.setUniqueId(player.getUniqueId())
+					.setName(FixHandCommand.COOLDOWN_NAME)
+					.setStart(Instant.now())
+					.setExpiry(expiry)
+					.build();
+			
+			account.setCooldown(cooldown);
+		}
 		
 		itemStack.setDurability((short) 0);
 		player.updateInventory();
@@ -60,10 +98,28 @@ class FixHandCommand extends FixCommand {
 		Text.getService().sendMessage(player, "fix-hand");
 	}
 
-	private Instant getExpiry()
+	private Instant getExpiry(Player player)
 	{
-		// TODO configurable
-		return Instant.now();
+		long cooldown = this.identifyCooldownLength(player);
+		
+		if (cooldown == -1)
+		{
+			return null;
+		}
+		
+		return Instant.now().plusMillis(cooldown);
+	}
+	
+	private long identifyCooldownLength(Player player)
+	{
+		String permission = this.cooldowns.keySet().stream().filter(player::hasPermission).findFirst().orElse(null);
+		
+		if (permission == null)
+		{
+			return -1;
+		}
+		
+		return this.cooldowns.get(permission);
 	}
 
 }
