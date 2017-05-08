@@ -1,6 +1,5 @@
 package com.ulfric.spigot.prison.plots;
 
-import com.ulfric.commons.spigot.plugin.PluginUtils;
 import com.ulfric.commons.spigot.point.PointUtils;
 import com.ulfric.commons.spigot.shape.Point;
 import com.ulfric.dragoon.container.Container;
@@ -30,13 +29,6 @@ public class PlotsService implements Plots, Listener {
 	{
 		World world = Bukkit.getWorld("world");
 		world.setAutoSave(false);
-		Bukkit.getScheduler().runTaskTimerAsynchronously(PluginUtils.getMainPlugin(), () ->
-		{
-			long start = System.currentTimeMillis();
-			Plot plot = generatePlot(3);
-			System.out.println(System.currentTimeMillis() - start);
-			plots.add(plot);
-		}, 0, 2);
 	}
 
 	@EventHandler
@@ -85,10 +77,6 @@ public class PlotsService implements Plots, Listener {
 				{
 					break;
 				}
-				if (failedBases.contains(base))
-				{
-					continue;
-				}
 				for (Vector direction : Plot.DIRECTIONS)
 				{
 					plot = new Plot(base, direction, sideLength);
@@ -101,7 +89,8 @@ public class PlotsService implements Plots, Listener {
 						plot = null;
 					}
 				}
-				if (plot == null){
+				if (plot == null)
+				{
 					failedBases.add(base);
 				}
 			}
@@ -155,13 +144,15 @@ public class PlotsService implements Plots, Listener {
 		List<Point> bases = new ArrayList<>();
 		for (Plot plot : plots)
 		{
-			if (!bases.contains(plot.getBase()))
-			{
-				bases.add(plot.getBase());
-			}
-			if (!bases.contains(plot.getFurthestXZ()))
-			{
-				bases.add(plot.getFurthestXZ());
+			if (!(failedBases.contains(plot.getBase()) &&failedBases.contains(plot.getFurthestXZ()))){
+				if (!bases.contains(plot.getBase()))
+				{
+					bases.add(plot.getBase());
+				}
+				if (!bases.contains(plot.getFurthestXZ()))
+				{
+					bases.add(plot.getFurthestXZ());
+				}
 			}
 		}
 		bases.sort((o1, o2) ->
