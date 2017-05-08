@@ -134,12 +134,10 @@ class FixAllCommand extends FixCommand {
 		return this.cooldowns.keySet().
 				stream().
 					filter(player::hasPermission).
-					collect(Collectors.toList()).
-						stream().
-							mapToLong(this.cooldowns::get).
-							boxed().
-							sorted(Collections.reverseOrder()).
-							findFirst().orElse(-1L);
+					mapToLong(this.cooldowns::get).
+					boxed().
+					sorted(Collections.reverseOrder()).
+					findFirst().orElse(-1L);
 	}
 
 }
