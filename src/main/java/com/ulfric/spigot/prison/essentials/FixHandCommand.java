@@ -7,6 +7,10 @@ import com.ulfric.commons.spigot.data.Data;
 import com.ulfric.commons.spigot.data.DataSection;
 import com.ulfric.commons.spigot.data.DataStore;
 import com.ulfric.commons.spigot.data.PersistentData;
+import com.ulfric.commons.spigot.economy.BalanceDeductionResult;
+import com.ulfric.commons.spigot.economy.BankAccount;
+import com.ulfric.commons.spigot.economy.CurrencyAmount;
+import com.ulfric.commons.spigot.economy.Economy;
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;
 import com.ulfric.dragoon.inject.Inject;
@@ -35,17 +39,28 @@ class FixHandCommand extends FixCommand {
 	private Container owner;
 	
 	private final Map<String, Long> cooldowns = new CaseInsensitiveMap<>();
+	private CurrencyAmount price;
 	
 	@Initialize
 	private void initialize()
 	{
 		PersistentData data = Data.getDataStore(this.owner).getDataStore("fix-command").getDefault();
-		this.loadCooldowns(data);
+		this.loadSettings(data);
+	}
+	
+	private void loadSettings(PersistentData data)
+	{
+		DataSection section = data.getSection("fix-hand");
+		
+		section.getSection("cooldowns").getSections().forEach(this::loadCooldown);
+		
+		DataSection settings = section.getSection("settings");
+		this.price = CurrencyAmount.parseCurrencyAmount(settings.getString("price"));
 	}
 	
 	private void loadCooldowns(PersistentData data)
 	{
-		data.getSection("fix-hand").getSections().forEach(this::loadCooldown);
+		data.getSection("fix-hand").getSection("cooldowns").getSections().forEach(this::loadCooldown);
 	}
 	
 	private void loadCooldown(DataSection section)
@@ -59,12 +74,13 @@ class FixHandCommand extends FixCommand {
 	public void run(Context context)
 	{
 		Player player = (Player) context.getSender();
+		Text text = Text.getService();
 		
 		ItemStack itemStack = player.getEquipment().getItemInMainHand();
 		
 		if (!this.isFixable(itemStack))
 		{
-			Text.getService().sendMessage(player, "fix-invalid-item");
+			text.sendMessage(player, "fix-invalid-item");
 			return;
 		}
 		
@@ -74,24 +90,54 @@ class FixHandCommand extends FixCommand {
 		{
 			Cooldown cooldown = account.getCooldown(FixHandCommand.COOLDOWN_NAME);
 			Instant remaining = cooldown.getRemaining();
-			Text.getService().sendMessage(player, "fix-hand-cooldown", PrisonMetadataDefaults.LAST_FIX_HAND_COOLDOWN, this.format(remaining));
+			text.sendMessage(player, "fix-hand-cooldown", PrisonMetadataDefaults.LAST_FIX_HAND_COOLDOWN, this.format(remaining));
 			return;
 		}
 		
 		Instant expiry = this.getExpiry(player);
 		
-		if (expiry != null)
+		if (expiry == null)
 		{
-			Cooldown cooldown = Cooldown.builder()
-					.setUniqueId(player.getUniqueId())
-					.setName(FixHandCommand.COOLDOWN_NAME)
-					.setStart(Instant.now())
-					.setExpiry(expiry)
-					.build();
+			if (this.price == null)
+			{
+				text.sendMessage(player, "fix-hand-fail");
+			}
+			else if (player.hasPermission("fix-hand-bypass"))
+			{
+				this.performFix(player, itemStack);
+			}
+			else
+			{
+				BankAccount bankAccount = Economy.getService().getAccount(player.getUniqueId());
+				BalanceDeductionResult result = bankAccount.deduct(this.price);
+				
+				if (result.isSuccess())
+				{
+					this.performFix(player, itemStack);
+				}
+				else
+				{
+					text.sendMessage(player, "fix-hand-cannot-afford");
+				}
+			}
 			
-			account.setCooldown(cooldown);
+			return;
 		}
 		
+		Cooldown cooldown = Cooldown.builder()
+				.setUniqueId(player.getUniqueId())
+				.setName(FixHandCommand.COOLDOWN_NAME)
+				.setStart(Instant.now())
+				.setExpiry(expiry)
+				.build();
+		
+		account.setCooldown(cooldown);
+		
+		this.performFix(player, itemStack);
+	}
+	
+	private void performFix(Player player, ItemStack itemStack)
+	{
 		itemStack.setDurability((short) 0);
 		player.updateInventory();
 		
