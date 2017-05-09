@@ -45,7 +45,7 @@ final class RepairService implements Service {
 	{
 		for (RepairType type : RepairType.values())
 		{
-			this.loadCooldowns(type, data.getSection(type.getFriendlyName()).getSections());
+			this.loadCooldowns(type, data.createSection(type.getFriendlyName()).getSections());
 		}
 	}
 	
