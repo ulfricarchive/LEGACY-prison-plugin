@@ -10,15 +10,14 @@ public class Plot extends Bean {
 
 	static final Vector[] DIRECTIONS = new Vector[]{new Vector(1, 0, 1), new Vector(-1, 0, 1),
 			new Vector(1, 0, -1), new Vector(-1, 0, -1)};
+	static final int SIDE_LENGTH = 30;
 	private final Point base;
 	private final Vector direction;
-	private final int sideLength;
 
 	Plot(Point base, Vector direction, int sideLength)
 	{
 		this.base = base;
 		this.direction = direction;
-		this.sideLength = sideLength;
 	}
 
 	Point getBase()
@@ -31,24 +30,19 @@ public class Plot extends Bean {
 		return direction;
 	}
 
-	int getSideLength()
-	{
-		return sideLength;
-	}
-
 	Point getFurthestXZ()
 	{
-		return PointUtils.add(base, direction.clone().multiply(sideLength));
+		return PointUtils.add(base, direction.clone().multiply(SIDE_LENGTH));
 	}
 
 	Point getFurthestX()
 	{
-		return PointUtils.add(base, direction.clone().multiply(sideLength).setZ(0));
+		return PointUtils.add(base, direction.clone().multiply(SIDE_LENGTH).setZ(0));
 	}
 
 	Point getFurthestZ()
 	{
-		return PointUtils.add(base, direction.clone().multiply(sideLength).setX(0));
+		return PointUtils.add(base, direction.clone().multiply(SIDE_LENGTH).setX(0));
 	}
 
 }

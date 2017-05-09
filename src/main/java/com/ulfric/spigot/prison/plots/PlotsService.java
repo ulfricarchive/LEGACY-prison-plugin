@@ -10,11 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 
 public class PlotsService implements Plots, Listener {
@@ -31,41 +28,9 @@ public class PlotsService implements Plots, Listener {
 		world.setAutoSave(false);
 	}
 
-	@EventHandler
-	public void test(PlayerInteractEvent event)
-	{
-		plots.forEach(this::outline);
-	}
-
-	private void outline(Plot plot)
-	{
-		World world = Bukkit.getWorld("world");
-		Vector direction = plot.getDirection();
-		Point min = PointUtils.multiply(plot.getBase(), direction);
-		Point max = PointUtils.multiply(plot.getFurthestXZ(), direction);
-		for (int x = min.getX(); x <= max.getX(); x++)
-		{
-			if (x == min.getX() || x == max.getX())
-			{
-				for (int z = min.getZ(); z <= max.getZ(); z++)
-				{
-					world.getBlockAt((int) (x * direction.getX()), 3, (int) (z * direction.getZ()))
-							.setType(Material.DIAMOND_BLOCK);
-				}
-			}
-			else
-			{
-				world.getBlockAt((int) (x * direction.getX()), 3, (int) (min.getZ() * direction.getZ()))
-						.setType(Material.DIAMOND_BLOCK);
-				world.getBlockAt((int) (x * direction.getX()), 3, (int) (max.getZ() * direction.getZ()))
-						.setType(Material.DIAMOND_BLOCK);
-			}
-		}
-	}
-
 	private HashSet<Point> failedBases = new HashSet<>();
 
-	private Plot generatePlot(int sideLength)
+	private Plot generatePlot()
 	{
 		Plot plot = null;
 		List<Point> bases = sortPlotsByRadius(Point.ZERO, plots);
@@ -79,7 +44,7 @@ public class PlotsService implements Plots, Listener {
 				}
 				for (Vector direction : Plot.DIRECTIONS)
 				{
-					plot = new Plot(base, direction, sideLength);
+					plot = new Plot(base, direction, Plot.SIDE_LENGTH);
 					if (checkCombinations(plot))
 					{
 						break;
@@ -97,7 +62,7 @@ public class PlotsService implements Plots, Listener {
 		}
 		else
 		{
-			plot = new Plot(Point.ZERO, Plot.DIRECTIONS[0], sideLength);
+			plot = new Plot(Point.ZERO, Plot.DIRECTIONS[0], Plot.SIDE_LENGTH);
 		}
 		return plot;
 	}
@@ -111,11 +76,11 @@ public class PlotsService implements Plots, Listener {
 	private boolean checkCombinations(Plot plot)
 	{
 		Plot plotX = new Plot(plot.getFurthestX(),
-				plot.getDirection().clone().multiply(new Vector(-1, 0, 1)), plot.getSideLength());
+				plot.getDirection().clone().multiply(new Vector(-1, 0, 1)), Plot.SIDE_LENGTH);
 		Plot plotZ = new Plot(plot.getFurthestZ(),
-				plot.getDirection().clone().multiply(new Vector(1, 0, -1)), plot.getSideLength());
+				plot.getDirection().clone().multiply(new Vector(1, 0, -1)), Plot.SIDE_LENGTH);
 		Plot plotXZ = new Plot(plot.getFurthestXZ(), plot.getDirection().clone().multiply(-1),
-				plot.getSideLength());
+				Plot.SIDE_LENGTH);
 		for (Plot plot1 : plots)
 		{
 			if (checkBaseDir(plot1, plot) || checkBaseDir(plot1, plotX) || checkBaseDir(plot1, plotZ)
@@ -144,7 +109,8 @@ public class PlotsService implements Plots, Listener {
 		List<Point> bases = new ArrayList<>();
 		for (Plot plot : plots)
 		{
-			if (!(failedBases.contains(plot.getBase()) &&failedBases.contains(plot.getFurthestXZ()))){
+			if (!(failedBases.contains(plot.getBase()) && failedBases.contains(plot.getFurthestXZ())))
+			{
 				if (!bases.contains(plot.getBase()))
 				{
 					bases.add(plot.getBase());
