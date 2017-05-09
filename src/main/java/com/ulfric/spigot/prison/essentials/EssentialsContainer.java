@@ -16,9 +16,6 @@ public class EssentialsContainer extends Container {
 		this.install(NightCommand.class);
 		this.install(NightVisionCommand.class);
 		this.install(SunCommand.class);
-		this.install(FixCommand.class);
-		this.install(FixHandCommand.class);
-		this.install(FixAllCommand.class);
 		this.install(BlocksCommand.class);
 		this.install(ClearInventoryCommand.class);
 		this.install(WorldCommand.class);
