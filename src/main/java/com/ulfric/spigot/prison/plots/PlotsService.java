@@ -8,9 +8,8 @@ import com.ulfric.dragoon.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
 
@@ -20,17 +19,14 @@ public class PlotsService implements Plots, Listener {
 
 	@Inject
 	private Container owner;
+	private HashSet<Point> failedBases = new HashSet<>();
 
 	@Initialize
 	private void initialize()
 	{
-		World world = Bukkit.getWorld("world");
-		world.setAutoSave(false);
 	}
 
-	private HashSet<Point> failedBases = new HashSet<>();
-
-	private Plot generatePlot()
+	public Plot generatePlot(UUID owner)
 	{
 		Plot plot = null;
 		List<Point> bases = sortPlotsByRadius(Point.ZERO, plots);
@@ -44,7 +40,7 @@ public class PlotsService implements Plots, Listener {
 				}
 				for (Vector direction : Plot.DIRECTIONS)
 				{
-					plot = new Plot(base, direction, Plot.SIDE_LENGTH);
+					plot = new Plot(owner, base, direction);
 					if (checkCombinations(plot))
 					{
 						break;
@@ -62,25 +58,25 @@ public class PlotsService implements Plots, Listener {
 		}
 		else
 		{
-			plot = new Plot(Point.ZERO, Plot.DIRECTIONS[0], Plot.SIDE_LENGTH);
+			plot = new Plot(owner, Point.ZERO, Plot.DIRECTIONS[0]);
 		}
 		return plot;
 	}
 
-	private boolean checkBaseDir(Plot plot, Plot plot1)
+	public boolean checkBaseDir(Plot plot, Plot plot1)
 	{
 		return plot1.getBase().equals(plot.getBase()) && plot1.getDirection()
 				.equals(plot.getDirection());
 	}
 
-	private boolean checkCombinations(Plot plot)
+	public boolean checkCombinations(Plot plot)
 	{
-		Plot plotX = new Plot(plot.getFurthestX(),
-				plot.getDirection().clone().multiply(new Vector(-1, 0, 1)), Plot.SIDE_LENGTH);
-		Plot plotZ = new Plot(plot.getFurthestZ(),
-				plot.getDirection().clone().multiply(new Vector(1, 0, -1)), Plot.SIDE_LENGTH);
-		Plot plotXZ = new Plot(plot.getFurthestXZ(), plot.getDirection().clone().multiply(-1),
-				Plot.SIDE_LENGTH);
+		Plot plotX = new Plot(plot.getOwner(), plot.getFurthestX(),
+				plot.getDirection().clone().multiply(new Vector(-1, 0, 1)));
+		Plot plotZ = new Plot(plot.getOwner(), plot.getFurthestZ(),
+				plot.getDirection().clone().multiply(new Vector(1, 0, -1)));
+		Plot plotXZ = new Plot(plot.getOwner(), plot.getFurthestXZ(),
+				plot.getDirection().clone().multiply(-1));
 		for (Plot plot1 : plots)
 		{
 			if (checkBaseDir(plot1, plot) || checkBaseDir(plot1, plotX) || checkBaseDir(plot1, plotZ)
@@ -92,7 +88,7 @@ public class PlotsService implements Plots, Listener {
 		return true;
 	}
 
-	public Plot getPlot(Point base, Vector direction)
+	public Plot getPlotByBaseDir(Point base, Vector direction)
 	{
 		for (Plot plot : plots)
 		{
@@ -104,7 +100,31 @@ public class PlotsService implements Plots, Listener {
 		return null;
 	}
 
-	private List<Point> sortPlotsByRadius(Point center, List<Plot> plots)
+	public Plot getPlotByUUID(UUID uuid)
+	{
+		for (Plot plot : plots)
+		{
+			if (plot.getUuid().equals(uuid))
+			{
+				return plot;
+			}
+		}
+		return null;
+	}
+
+	public Plot getPlotByOwner(UUID owner)
+	{
+		for (Plot plot : plots)
+		{
+			if (plot.getOwner().equals(owner))
+			{
+				return plot;
+			}
+		}
+		return null;
+	}
+
+	public List<Point> sortPlotsByRadius(Point center, List<Plot> plots)
 	{
 		List<Point> bases = new ArrayList<>();
 		for (Plot plot : plots)
