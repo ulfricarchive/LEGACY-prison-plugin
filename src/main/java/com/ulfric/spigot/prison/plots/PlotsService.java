@@ -38,7 +38,7 @@ public class PlotsService implements Plots, Listener {
 				{
 					break;
 				}
-				for (Vector direction : Plot.DIRECTIONS)
+				for (Vector direction : PlotConfig.DIRECTIONS)
 				{
 					plot = new Plot(owner, base, direction);
 					if (checkCombinations(plot))
@@ -58,7 +58,7 @@ public class PlotsService implements Plots, Listener {
 		}
 		else
 		{
-			plot = new Plot(owner, Point.ZERO, Plot.DIRECTIONS[0]);
+			plot = new Plot(owner, Point.ZERO, PlotConfig.DIRECTIONS[0]);
 		}
 		return plot;
 	}

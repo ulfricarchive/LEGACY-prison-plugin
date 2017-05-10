@@ -7,13 +7,11 @@ import com.ulfric.commons.spigot.point.PointUtils;
 import com.ulfric.commons.spigot.shape.InclusiveCuboid;
 import com.ulfric.commons.spigot.shape.Point;
 import java.util.UUID;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.util.Vector;
 
 public class Plot extends Bean {
-
-	static final Vector[] DIRECTIONS = new Vector[]{new Vector(1, 0, 1), new Vector(-1, 0, 1),
-			new Vector(1, 0, -1), new Vector(-1, 0, -1)};
-	private static final int SIDE_LENGTH = 30;
 
 	private final Point base;
 	private final Vector direction;
@@ -33,7 +31,8 @@ public class Plot extends Bean {
 			InclusiveCuboid inclusiveCuboid = new InclusiveCuboid(regionPlot.getBase(),
 					Point.builder().setX(regionPlot.getFurthestXZ().getX()).setY(256)
 							.setZ(regionPlot.getFurthestXZ().getZ()).build());
-			region = Region.builder().setBounds(inclusiveCuboid).setName(uuid.toString()).build();
+			World world = Bukkit.getWorld(PlotConfig.worldName);
+			region = Region.builder().setBounds(inclusiveCuboid).setName(uuid.toString()).setWorld(world.getUID()).build();
 		}
 	}
 
@@ -88,17 +87,17 @@ public class Plot extends Bean {
 
 	Point getFurthestXZ()
 	{
-		return PointUtils.add(base, direction.clone().multiply(SIDE_LENGTH));
+		return PointUtils.add(base, direction.clone().multiply(PlotConfig.SIDE_LENGTH));
 	}
 
 	Point getFurthestX()
 	{
-		return PointUtils.add(base, direction.clone().multiply(SIDE_LENGTH).setZ(0));
+		return PointUtils.add(base, direction.clone().multiply(PlotConfig.SIDE_LENGTH).setZ(0));
 	}
 
 	Point getFurthestZ()
 	{
-		return PointUtils.add(base, direction.clone().multiply(SIDE_LENGTH).setX(0));
+		return PointUtils.add(base, direction.clone().multiply(PlotConfig.SIDE_LENGTH).setX(0));
 	}
 
 }
