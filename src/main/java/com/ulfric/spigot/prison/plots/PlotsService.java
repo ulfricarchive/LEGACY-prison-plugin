@@ -1,35 +1,37 @@
 package com.ulfric.spigot.prison.plots;
 
+import com.google.common.collect.Iterables;
+import com.google.gson.GsonBuilder;
 import com.ulfric.commons.spigot.point.PointUtils;
 import com.ulfric.commons.spigot.shape.Point;
-import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;
-import com.ulfric.dragoon.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
 
 public class PlotsService implements Plots, Listener {
 
-	private List<Plot> plots = new CopyOnWriteArrayList<>();
+	private ConcurrentHashMap<UUID, Set<Plot>> mappedPlots = new ConcurrentHashMap<>();
 
-	@Inject
-	private Container owner;
 	private HashSet<Point> failedBases = new HashSet<>();
 
 	@Initialize
 	private void initialize()
 	{
+		System.out.println(
+				new GsonBuilder().setPrettyPrinting().create().toJson(generatePlot(UUID.randomUUID())));
 	}
 
 	public Plot generatePlot(UUID owner)
 	{
-		Plot plot = null;
+		List<Plot> plots = getPlotList();
 		List<Point> bases = sortPlotsByRadius(Point.ZERO, plots);
+		Plot plot = null;
 		if (plots.size() > 0)
 		{
 			for (Point base : bases)
@@ -60,6 +62,16 @@ public class PlotsService implements Plots, Listener {
 		{
 			plot = new Plot(owner, Point.ZERO, PlotConfig.DIRECTIONS[0]);
 		}
+		if (plot != null)
+		{
+			Set<Plot> ownerPlots = new HashSet<>();
+			if (mappedPlots.contains(owner))
+			{
+				ownerPlots = mappedPlots.get(owner);
+			}
+			ownerPlots.add(plot);
+			mappedPlots.put(owner, ownerPlots);
+		}
 		return plot;
 	}
 
@@ -71,6 +83,7 @@ public class PlotsService implements Plots, Listener {
 
 	public boolean checkCombinations(Plot plot)
 	{
+		List<Plot> plots = getPlotList();
 		Plot plotX = new Plot(plot.getOwner(), plot.getFurthestX(),
 				plot.getDirection().clone().multiply(new Vector(-1, 0, 1)));
 		Plot plotZ = new Plot(plot.getOwner(), plot.getFurthestZ(),
@@ -90,6 +103,7 @@ public class PlotsService implements Plots, Listener {
 
 	public Plot getPlotByBaseDir(Point base, Vector direction)
 	{
+		List<Plot> plots = getPlotList();
 		for (Plot plot : plots)
 		{
 			if (plot.getBase().equals(base) && plot.getDirection().equals(direction))
@@ -102,45 +116,30 @@ public class PlotsService implements Plots, Listener {
 
 	public Plot getPlotByUUID(UUID uuid)
 	{
-		for (Plot plot : plots)
-		{
-			if (plot.getUuid().equals(uuid))
-			{
-				return plot;
-			}
-		}
-		return null;
+		List<Plot> plots = getPlotList();
+		return plots.stream().filter(plot -> plot.getUuid().equals(uuid)).findFirst().get();
 	}
 
-	public Plot getPlotByOwner(UUID owner)
+	public Set<Plot> getPlotByOwner(UUID owner)
 	{
-		for (Plot plot : plots)
-		{
-			if (plot.getOwner().equals(owner))
-			{
-				return plot;
-			}
-		}
-		return null;
+		return mappedPlots.get(owner);
 	}
 
 	public List<Point> sortPlotsByRadius(Point center, List<Plot> plots)
 	{
 		List<Point> bases = new ArrayList<>();
-		for (Plot plot : plots)
+		plots.stream().filter(plot -> !(failedBases.contains(plot.getBase()) && failedBases
+				.contains(plot.getFurthestXZ()))).forEachOrdered(plot ->
 		{
-			if (!(failedBases.contains(plot.getBase()) && failedBases.contains(plot.getFurthestXZ())))
+			if (!bases.contains(plot.getBase()))
 			{
-				if (!bases.contains(plot.getBase()))
-				{
-					bases.add(plot.getBase());
-				}
-				if (!bases.contains(plot.getFurthestXZ()))
-				{
-					bases.add(plot.getFurthestXZ());
-				}
+				bases.add(plot.getBase());
 			}
-		}
+			if (!bases.contains(plot.getFurthestXZ()))
+			{
+				bases.add(plot.getFurthestXZ());
+			}
+		});
 		bases.sort((o1, o2) ->
 		{
 			double d1 = PointUtils.substract(center, o1).length();
@@ -148,6 +147,16 @@ public class PlotsService implements Plots, Listener {
 			return Double.compare(d1, d2);
 		});
 		return bases;
+	}
+
+	private List<Plot> getPlotList()
+	{
+		List<Plot> plots = new ArrayList<>();
+		for (Set<Plot> plotSet : mappedPlots.values())
+		{
+			Iterables.concat(plots, plotSet);
+		}
+		return plots;
 	}
 
 }

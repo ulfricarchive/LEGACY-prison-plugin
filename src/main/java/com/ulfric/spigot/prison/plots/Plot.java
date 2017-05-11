@@ -32,7 +32,8 @@ public class Plot extends Bean {
 					Point.builder().setX(regionPlot.getFurthestXZ().getX()).setY(256)
 							.setZ(regionPlot.getFurthestXZ().getZ()).build());
 			World world = Bukkit.getWorld(PlotConfig.worldName);
-			region = Region.builder().setBounds(inclusiveCuboid).setName(uuid.toString()).setWorld(world.getUID()).build();
+			region = Region.builder().setBounds(inclusiveCuboid).setName(uuid.toString())
+					.setWorld(world.getUID()).build();
 		}
 	}
 

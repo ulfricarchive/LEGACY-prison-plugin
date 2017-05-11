@@ -3,6 +3,7 @@ package com.ulfric.spigot.prison.plots;
 import com.ulfric.commons.service.Service;
 import com.ulfric.commons.spigot.shape.Point;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.bukkit.util.Vector;
 
@@ -16,7 +17,7 @@ public interface Plots extends Service {
 
 	Plot getPlotByUUID(UUID uuid);
 
-	Plot getPlotByOwner(UUID owner);
+	Set<Plot> getPlotByOwner(UUID owner);
 
 	List<Point> sortPlotsByRadius(Point center, List<Plot> plots);
 
