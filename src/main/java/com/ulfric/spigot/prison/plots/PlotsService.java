@@ -1,6 +1,5 @@
 package com.ulfric.spigot.prison.plots;
 
-import com.google.common.collect.Iterables;
 import com.google.gson.GsonBuilder;
 import com.ulfric.commons.spigot.point.PointUtils;
 import com.ulfric.commons.spigot.shape.Point;
@@ -152,10 +151,7 @@ public class PlotsService implements Plots, Listener {
 	private List<Plot> getPlotList()
 	{
 		List<Plot> plots = new ArrayList<>();
-		for (Set<Plot> plotSet : mappedPlots.values())
-		{
-			Iterables.concat(plots, plotSet);
-		}
+		mappedPlots.values().forEach(plots::addAll);
 		return plots;
 	}
 
