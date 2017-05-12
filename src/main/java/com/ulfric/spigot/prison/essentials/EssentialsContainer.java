@@ -2,6 +2,7 @@ package com.ulfric.spigot.prison.essentials;
 
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;
+import com.ulfric.spigot.prison.essentials.repair.RepairContainer;
 
 public class EssentialsContainer extends Container {
 
@@ -20,6 +21,7 @@ public class EssentialsContainer extends Container {
 		this.install(ClearInventoryCommand.class);
 		this.install(WorldCommand.class);
 		this.install(WorldCreateCommand.class);
+		this.install(RepairContainer.class);
 	}
 
 }
