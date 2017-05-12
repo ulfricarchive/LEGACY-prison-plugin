@@ -34,7 +34,6 @@ class ClearInventoryCommand implements Command {
 			}
 			else
 			{
-				// TODO error
 				return;
 			}
 		}
@@ -51,6 +50,9 @@ class ClearInventoryCommand implements Command {
 
 		text.sendMessage(sender, "clearinventory-other-sender",
 				PrisonMetadataDefaults.LAST_CLEARED_INVENTORY_TARGET, target.getName());
+		
+		text.sendMessage(target, "clearinventory-other-target",
+				PrisonMetadataDefaults.LAST_CLEARED_INVENTORY_SENDER, sender.getName());
 	}
 
 }

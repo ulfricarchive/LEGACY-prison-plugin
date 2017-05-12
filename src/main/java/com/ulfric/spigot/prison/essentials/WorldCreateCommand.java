@@ -9,6 +9,7 @@ import com.ulfric.commons.spigot.command.Context;
 import com.ulfric.commons.spigot.command.Permission;
 import com.ulfric.commons.spigot.command.argument.Argument;
 import com.ulfric.commons.spigot.text.Text;
+import com.ulfric.spigot.prison.metadata.PrisonMetadataDefaults;
 
 @Name("create")
 @Permission("world-create-use")
@@ -21,12 +22,11 @@ class WorldCreateCommand extends WorldCommand {
 	public void run(Context context)
 	{
 		CommandSender sender = context.getSender();
-
-		Text.getService().sendMessage(sender, "world-creating");
-
+		Text text = Text.getService();
+		
+		text.sendMessage(sender, "world-creating", PrisonMetadataDefaults.LAST_WORLD_CREATED, this.worldName);
 		Bukkit.createWorld(WorldCreator.name(this.worldName));
-
-		Text.getService().sendMessage(sender, "world-created");
+		text.sendMessage(sender, "world-created", PrisonMetadataDefaults.LAST_WORLD_CREATED, this.worldName);
 	}
 
 }

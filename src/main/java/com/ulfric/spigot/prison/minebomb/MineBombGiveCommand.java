@@ -34,7 +34,8 @@ class MineBombGiveCommand extends MineBombCommand {
 		
 		if (!mineBombs.isTier(this.tier))
 		{
-			text.sendMessage(sender, "minebomb-invalid-tier");
+			text.sendMessage(sender, "minebomb-invalid-tier",
+					PrisonMetadataDefaults.LAST_MINE_BOMB_INVALID_TIER, this.tier.toString());
 			return;
 		}
 		

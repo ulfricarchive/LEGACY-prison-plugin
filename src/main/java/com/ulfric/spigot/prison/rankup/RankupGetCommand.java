@@ -18,6 +18,7 @@ import com.ulfric.spigot.prison.metadata.PrisonMetadataDefaults;
 class RankupGetCommand extends RankupCommand {
 	 
 	@Argument(optional = true)
+	@Permission("rankup-show-others")
 	private Player player;
 	
 	@Override
@@ -31,19 +32,13 @@ class RankupGetCommand extends RankupCommand {
 		{
 			Rank rank = ranks.getRank(player);
 			text.sendMessage(player, "rankup-show", PrisonMetadataDefaults.LAST_RANK_UP_VIEW, rank.getName());
-		}
-		else if	(!player.hasPermission("rankup-show-others"))
-		{
-			text.sendMessage(player, "rankup-no-permission");
-		}
-		else
-		{
-			Rank rank = ranks.getRank(this.player);
-			text.sendMessage(player, "rankup-show-other",
-					PrisonMetadataDefaults.LAST_RANK_UP_VIEW, rank.getName(),
-					PrisonMetadataDefaults.LAST_RANK_UP_VIEW_USER, this.player.getName());
+			return;
 		}
 		
+		Rank rank = ranks.getRank(this.player);
+		text.sendMessage(player, "rankup-show-other",
+				PrisonMetadataDefaults.LAST_RANK_UP_VIEW, rank.getName(),
+				PrisonMetadataDefaults.LAST_RANK_UP_VIEW_USER, this.player.getName());
 	}
 	
 }

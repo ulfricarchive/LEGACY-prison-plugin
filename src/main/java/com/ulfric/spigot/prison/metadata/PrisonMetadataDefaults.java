@@ -11,12 +11,16 @@ public class PrisonMetadataDefaults {
 	public static final String LAST_BLOCKS_QUANTITY = "LastBlocksQuantity";
 	public static final String LAST_CLEARED_INVENTORY_TARGET = "LastClearedInventoryTarget";
 	public static final String LAST_CLEARED_INVENTORY_SENDER = "LastClearedInventorySender";
+	public static final String LAST_MINE_BOMB_INVALID_TIER = "LastMineBombInvalidTier";
 	public static final String LAST_MINE_BOMB_GIVE_AMOUNT = "LastMineBombGiveAmount";
 	public static final String LAST_MINE_BOMB_GIVE_USER = "LastMineBombGiveUser";
 	public static final String LAST_MINE_BOMB_RECEIVE_AMOUNT = "LastMineBombReceiveAmount";
+	public static final String LAST_MINE_ROCKET_INVALID_TIER = "LastMineRocketInvalidTier";
 	public static final String LAST_MINE_ROCKET_GIVE_AMOUNT = "LastMineRocketGiveAmount";
 	public static final String LAST_MINE_ROCKET_GIVE_USER = "LastMineRocketGiveUser";
 	public static final String LAST_MINE_ROCKET_RECEIVE_AMOUNT = "LastMineRocketReceiveAmount";
+	public static final String LAST_WORLD_CREATED = "LastWorldCreated";
+	public static final String LAST_WORLD_LOOKUP = "LastWorldLookup";
 
 	private PrisonMetadataDefaults()
 	{

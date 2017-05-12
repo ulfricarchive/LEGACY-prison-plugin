@@ -1,6 +1,5 @@
 package com.ulfric.spigot.prison.essentials;
 
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -10,7 +9,9 @@ import com.ulfric.commons.spigot.command.Context;
 import com.ulfric.commons.spigot.command.MustBePlayer;
 import com.ulfric.commons.spigot.command.Permission;
 import com.ulfric.commons.spigot.command.argument.Argument;
+import com.ulfric.commons.spigot.location.WorldUtils;
 import com.ulfric.commons.spigot.text.Text;
+import com.ulfric.spigot.prison.metadata.PrisonMetadataDefaults;
 
 @Name("world")
 @Permission("world-use")
@@ -24,19 +25,18 @@ class WorldCommand implements Command {
 	public void run(Context context)
 	{
 		Player player = (Player) context.getSender();
-
-		World world = Bukkit.getWorld(this.worldName);
+		Text text = Text.getService();
+		
+		World world = WorldUtils.getWorld(this.worldName);
 
 		if (world == null)
 		{
-			Text.getService().sendMessage(player, "world-not-found");
-
+			text.sendMessage(player, "world-not-found", PrisonMetadataDefaults.LAST_WORLD_LOOKUP, this.worldName);
 			return;
 		}
 
 		player.teleport(world.getSpawnLocation());
-
-		Text.getService().sendMessage(player, "world-teleported");
+		text.sendMessage(player, "world-teleported", PrisonMetadataDefaults.LAST_WORLD_LOOKUP, this.worldName);
 	}
 
 }

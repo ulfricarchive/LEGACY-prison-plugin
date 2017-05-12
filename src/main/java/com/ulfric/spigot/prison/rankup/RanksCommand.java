@@ -11,6 +11,7 @@ import com.ulfric.commons.spigot.text.Text;
 class RanksCommand implements Command {
 	
 	@Override
+	// todo: discuss this for format etc.
 	public void run(Context context)
 	{
 		Text.getService().sendMessage(context.getSender(), "rankup-ranks");

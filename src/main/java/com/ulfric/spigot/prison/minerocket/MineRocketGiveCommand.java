@@ -34,7 +34,8 @@ class MineRocketGiveCommand extends MineRocketCommand {
 		
 		if (!mineRockets.isTier(this.tier))
 		{
-			text.sendMessage(sender, "minerocket-invalid-tier");
+			text.sendMessage(sender, "minerocket-invalid-tier",
+					PrisonMetadataDefaults.LAST_MINE_ROCKET_INVALID_TIER, this.tier.toString());
 			return;
 		}
 		

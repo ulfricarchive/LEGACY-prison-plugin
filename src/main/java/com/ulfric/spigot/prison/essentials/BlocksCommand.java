@@ -29,8 +29,15 @@ class BlocksCommand implements Command {
 	public void run(Context context)
 	{
 		Player player = (Player) context.getSender();
+		Text text = Text.getService();
 		
 		Map<Translation, Integer> collector = this.collect(player);
+		
+		if (collector.isEmpty())
+		{
+			text.sendMessage(player, "blocks-no-items");
+			return;
+		}
 		
 		collector.forEach((translation, integer) ->
 		{
@@ -44,7 +51,7 @@ class BlocksCommand implements Command {
 		
 		player.updateInventory();
 		
-		Text.getService().sendMessage(player, "blocks-use", PrisonMetadataDefaults.LAST_BLOCKS_QUANTITY,
+		text.sendMessage(player, "blocks-use", PrisonMetadataDefaults.LAST_BLOCKS_QUANTITY,
 				String.valueOf(collector.values().stream().mapToInt(Integer::intValue).sum()));
 	}
 	
