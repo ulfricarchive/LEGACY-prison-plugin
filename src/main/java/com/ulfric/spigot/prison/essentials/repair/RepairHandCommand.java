@@ -11,6 +11,8 @@ import com.ulfric.commons.spigot.cooldown.Cooldown;
 import com.ulfric.commons.spigot.cooldown.CooldownAccount;
 import com.ulfric.commons.spigot.cooldown.Cooldowns;
 import com.ulfric.commons.spigot.text.Text;
+import com.ulfric.commons.text.FormatUtils;
+import com.ulfric.spigot.prison.metadata.PrisonMetadataDefaults;
 
 import java.time.Instant;
 
@@ -44,7 +46,8 @@ class RepairHandCommand extends RepairCommand {
 		{
 			Cooldown cooldown = account.getCooldown(RepairHandCommand.COOLDOWN_NAME);
 			Instant remaining = cooldown.getRemaining();
-			// todo: format util to send message
+			text.sendMessage(player, "repair-hand-cooldown",
+					PrisonMetadataDefaults.LAST_FIX_HAND_COOLDOWN, FormatUtils.formatRemaining(remaining.toEpochMilli()));
 			return;
 		}
 		
