@@ -11,5 +11,4 @@ public class PlotsContainer extends Container {
 		this.install(PlotsService.class);
 	}
 
-
 }

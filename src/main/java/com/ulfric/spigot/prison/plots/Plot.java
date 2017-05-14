@@ -6,10 +6,11 @@ import com.ulfric.commons.spigot.guard.Region;
 import com.ulfric.commons.spigot.point.PointUtils;
 import com.ulfric.commons.spigot.shape.InclusiveCuboid;
 import com.ulfric.commons.spigot.shape.Point;
-import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
+
+import java.util.UUID;
 
 public class Plot extends Bean {
 

@@ -2,10 +2,11 @@ package com.ulfric.spigot.prison.plots;
 
 import com.ulfric.commons.service.Service;
 import com.ulfric.commons.spigot.shape.Point;
+import org.bukkit.util.Vector;
+
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.bukkit.util.Vector;
 
 public interface Plots extends Service {
 
