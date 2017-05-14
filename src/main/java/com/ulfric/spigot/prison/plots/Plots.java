@@ -4,7 +4,6 @@ import com.ulfric.commons.service.Service;
 import com.ulfric.commons.spigot.shape.Point;
 import org.bukkit.util.Vector;
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -20,7 +19,7 @@ public interface Plots extends Service {
 
 	Set<Plot> getPlotByOwner(UUID owner);
 
-	List<Point> sortPlotsByRadius(Point center, List<Plot> plots);
+	Set<Point> sortPlotsByRadius(Point center, Set<Plot> plots);
 
 	Plot generatePlot(UUID owner);
 

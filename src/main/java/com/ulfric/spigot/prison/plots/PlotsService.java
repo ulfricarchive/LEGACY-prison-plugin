@@ -10,26 +10,27 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class PlotsService implements Plots, Listener {
 
-	private ConcurrentHashMap<UUID, Set<Plot>> mappedPlots = new ConcurrentHashMap<>();
+	private ConcurrentMap<UUID, Set<Plot>> mappedPlots = new ConcurrentHashMap<>();
 
-	private HashSet<Point> failedBases = new HashSet<>();
+	private Set<Point> failedBases = ConcurrentHashMap.newKeySet();
 
 	@Initialize
 	private void initialize()
 	{
 		//loadplots
 		Bukkit.getScheduler().runTaskTimerAsynchronously(PluginUtils.getMainPlugin(), () ->
-				generatePlot(UUID.fromString("069a79f4-44e9-4726-a5be-fca90e38aaf5")), 0, 5);
+				generatePlot(UUID.fromString("069a79f4-44e9-4726-a5be-fca90e38aaf5")), 0, 0);
 	}
 
 	public Plot generatePlot(UUID owner)
 	{
 		long start = System.currentTimeMillis();
-		List<Plot> plots = getPlotList();
-		List<Point> bases = sortPlotsByRadius(Point.ZERO, plots);
+		Set<Plot> plots = getPlotList();
+		Set<Point> bases = sortPlotsByRadius(Point.ZERO, plots);
 		Plot plot = null;
 		if (plots.size() > 0)
 		{
@@ -71,7 +72,7 @@ public class PlotsService implements Plots, Listener {
 			ownerPlots.add(plot);
 			mappedPlots.put(owner, ownerPlots);
 		}
-		System.out.println(System.currentTimeMillis() - start);
+		System.out.println((System.currentTimeMillis() - start) + " --- " + plots.size());
 		return plot;
 	}
 
@@ -83,18 +84,19 @@ public class PlotsService implements Plots, Listener {
 
 	public boolean checkCombinations(Plot plot)
 	{
+		Set<Plot> plots = getPlotList();
 		Plot plotX = new Plot(plot.getFurthestX(),
 				plot.getDirection().clone().multiply(new Vector(-1, 0, 1)));
 		Plot plotZ = new Plot(plot.getFurthestZ(),
 				plot.getDirection().clone().multiply(new Vector(1, 0, -1)));
 		Plot plotXZ = new Plot(plot.getFurthestXZ(),
 				plot.getDirection().clone().multiply(-1));
-		return !(mappedPlots.contains(plot) && mappedPlots.contains(plotX) && mappedPlots.contains(plotZ) && mappedPlots.contains(plotXZ));
+		return !(plots.contains(plot) || plots.contains(plotX) || plots.contains(plotZ) || plots.contains(plotXZ));
 	}
 
 	public Plot getPlotByBaseDir(Point base, Vector direction)
 	{
-		List<Plot> plots = getPlotList();
+		Set<Plot> plots = getPlotList();
 		for (Plot plot : plots)
 		{
 			if (plot.getBase().equals(base) && plot.getDirection().equals(direction))
@@ -107,7 +109,7 @@ public class PlotsService implements Plots, Listener {
 
 	public Plot getPlotByUUID(UUID uuid)
 	{
-		List<Plot> plots = getPlotList();
+		Set<Plot> plots = getPlotList();
 		return plots.stream().filter(plot -> plot.getUuid().equals(uuid)).findFirst().get();
 	}
 
@@ -116,7 +118,7 @@ public class PlotsService implements Plots, Listener {
 		return mappedPlots.get(owner);
 	}
 
-	public List<Point> sortPlotsByRadius(Point center, List<Plot> plots)
+	public Set<Point> sortPlotsByRadius(Point center, Set<Plot> plots)
 	{
 		List<Point> bases = new ArrayList<>();
 		plots.stream().filter(plot -> !(failedBases.contains(plot.getBase()) && failedBases
@@ -137,12 +139,14 @@ public class PlotsService implements Plots, Listener {
 			double d2 = PointUtils.substract(center, o2).length();
 			return Double.compare(d1, d2);
 		});
-		return bases;
+		LinkedHashSet<Point> set = new LinkedHashSet<>();
+		set.addAll(bases);
+		return set;
 	}
 
-	private List<Plot> getPlotList()
+	private Set<Plot> getPlotList()
 	{
-		List<Plot> plots = new ArrayList<>();
+		Set<Plot> plots = new HashSet<>();
 		mappedPlots.values().forEach(plots::addAll);
 		return plots;
 	}
