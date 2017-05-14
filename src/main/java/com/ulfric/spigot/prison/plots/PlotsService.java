@@ -1,9 +1,10 @@
 package com.ulfric.spigot.prison.plots;
 
-import com.google.gson.GsonBuilder;
+import com.ulfric.commons.spigot.plugin.PluginUtils;
 import com.ulfric.commons.spigot.point.PointUtils;
 import com.ulfric.commons.spigot.shape.Point;
 import com.ulfric.dragoon.initialize.Initialize;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
 
@@ -19,12 +20,14 @@ public class PlotsService implements Plots, Listener {
 	@Initialize
 	private void initialize()
 	{
-		System.out.println(
-				new GsonBuilder().setPrettyPrinting().create().toJson(generatePlot(UUID.randomUUID())));
+		//loadplots
+		Bukkit.getScheduler().runTaskTimerAsynchronously(PluginUtils.getMainPlugin(), () ->
+				generatePlot(UUID.fromString("069a79f4-44e9-4726-a5be-fca90e38aaf5")), 0, 5);
 	}
 
 	public Plot generatePlot(UUID owner)
 	{
+		long start = System.currentTimeMillis();
 		List<Plot> plots = getPlotList();
 		List<Point> bases = sortPlotsByRadius(Point.ZERO, plots);
 		Plot plot = null;
@@ -61,13 +64,14 @@ public class PlotsService implements Plots, Listener {
 		if (plot != null)
 		{
 			Set<Plot> ownerPlots = new HashSet<>();
-			if (mappedPlots.contains(owner))
+			if (mappedPlots.containsKey(owner))
 			{
 				ownerPlots = mappedPlots.get(owner);
 			}
 			ownerPlots.add(plot);
 			mappedPlots.put(owner, ownerPlots);
 		}
+		System.out.println(System.currentTimeMillis() - start);
 		return plot;
 	}
 
@@ -79,22 +83,13 @@ public class PlotsService implements Plots, Listener {
 
 	public boolean checkCombinations(Plot plot)
 	{
-		List<Plot> plots = getPlotList();
-		Plot plotX = new Plot(plot.getOwner(), plot.getFurthestX(),
+		Plot plotX = new Plot(plot.getFurthestX(),
 				plot.getDirection().clone().multiply(new Vector(-1, 0, 1)));
-		Plot plotZ = new Plot(plot.getOwner(), plot.getFurthestZ(),
+		Plot plotZ = new Plot(plot.getFurthestZ(),
 				plot.getDirection().clone().multiply(new Vector(1, 0, -1)));
-		Plot plotXZ = new Plot(plot.getOwner(), plot.getFurthestXZ(),
+		Plot plotXZ = new Plot(plot.getFurthestXZ(),
 				plot.getDirection().clone().multiply(-1));
-		for (Plot plot1 : plots)
-		{
-			if (checkBaseDir(plot1, plot) || checkBaseDir(plot1, plotX) || checkBaseDir(plot1, plotZ)
-					|| checkBaseDir(plot1, plotXZ))
-			{
-				return false;
-			}
-		}
-		return true;
+		return !(mappedPlots.contains(plot) && mappedPlots.contains(plotX) && mappedPlots.contains(plotZ) && mappedPlots.contains(plotXZ));
 	}
 
 	public Plot getPlotByBaseDir(Point base, Vector direction)
