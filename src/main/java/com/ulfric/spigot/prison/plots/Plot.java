@@ -1,21 +1,27 @@
 package com.ulfric.spigot.prison.plots;
 
 
-import com.google.common.base.Objects;
+import com.google.gson.annotations.Expose;
 import com.ulfric.commons.spigot.guard.Region;
 import com.ulfric.commons.spigot.point.PointUtils;
+import com.ulfric.commons.spigot.shape.InclusiveCuboid;
 import com.ulfric.commons.spigot.shape.Point;
-import org.bukkit.util.Vector;
-
 import java.util.UUID;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.util.Vector;
 
 public class Plot {
 
+	@Expose
 	private final Point base;
+	@Expose
 	private final Vector direction;
+	@Expose
 	private final UUID uuid;
+	@Expose
 	private final UUID owner;
-	private Region region;
+	private final Region region;
 
 	Plot(UUID owner, Point base, Vector direction)
 	{
@@ -24,15 +30,19 @@ public class Plot {
 		this.uuid = UUID.randomUUID();
 		this.owner = owner;
 		Plot regionPlot = findRegionPlot();
-		//		if (regionPlot != null)
-		//		{
-		//			InclusiveCuboid inclusiveCuboid = new InclusiveCuboid(regionPlot.getBase(),
-		//					Point.builder().setX(regionPlot.getFurthestXZ().getX()).setY(256)
-		//							.setZ(regionPlot.getFurthestXZ().getZ()).build());
-		//			World world = Bukkit.getWorld(PlotConfig.worldName);
-		//			region = Region.builder().setBounds(inclusiveCuboid).setName(uuid.toString())
-		//					.setWorld(world.getUID()).build();
-		//		}
+		if (regionPlot != null)
+		{
+			InclusiveCuboid inclusiveCuboid = new InclusiveCuboid(regionPlot.getBase(),
+					Point.builder().setX(regionPlot.getFurthestXZ().getX()).setY(256)
+							.setZ(regionPlot.getFurthestXZ().getZ()).build());
+			World world = Bukkit.getWorld(PlotConfig.worldName);
+			this.region = Region.builder().setBounds(inclusiveCuboid).setName(this.uuid.toString())
+					.setWorld(world.getUID()).build();
+		}
+		else
+		{
+			this.region = null;
+		}
 	}
 
 	Plot(Point base, Vector direction)
@@ -41,7 +51,7 @@ public class Plot {
 		this.direction = direction;
 		this.uuid = null;
 		this.owner = null;
-
+		this.region = null;
 	}
 
 	public Region getRegion()
