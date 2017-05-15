@@ -1,29 +1,41 @@
 package com.ulfric.spigot.prison.plots;
 
-import com.ulfric.commons.spigot.plugin.PluginUtils;
 import com.ulfric.commons.spigot.point.PointUtils;
 import com.ulfric.commons.spigot.shape.Point;
 import com.ulfric.dragoon.initialize.Initialize;
-import org.bukkit.Bukkit;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 public class PlotsService implements Plots, Listener {
 
+	private static PlotsService instance;
 	private ConcurrentMap<UUID, Set<Plot>> mappedPlots = new ConcurrentHashMap<>();
-
 	private Set<Point> failedBases = ConcurrentHashMap.newKeySet();
 
 	@Initialize
 	private void initialize()
 	{
-		//loadplots
-		Bukkit.getScheduler().runTaskTimerAsynchronously(PluginUtils.getMainPlugin(), () ->
-				generatePlot(UUID.fromString("069a79f4-44e9-4726-a5be-fca90e38aaf5")), 0, 0);
+		instance = this;
+	}
+
+	public static PlotsService getService(){
+		return instance;
+	}
+
+	public void loadPlots(){
+		//TODO deserialize plots
+	}
+
+	public void savePlots(){
+		//TODO serialize plots
 	}
 
 	public Plot generatePlot(UUID owner)

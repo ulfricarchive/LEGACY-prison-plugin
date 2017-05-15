@@ -9,6 +9,12 @@ public class PlotsContainer extends Container {
 	private void initialize()
 	{
 		this.install(PlotsService.class);
+		PlotsService.getService().loadPlots();
 	}
 
+	@Override
+	public void onDisable()
+	{
+		PlotsService.getService().savePlots();
+	}
 }
