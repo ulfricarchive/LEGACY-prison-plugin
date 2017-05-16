@@ -3,20 +3,22 @@ package com.ulfric.spigot.prison.plots;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ulfric.commons.service.Service;
+import com.ulfric.commons.spigot.plugin.PluginUtils;
 import com.ulfric.commons.spigot.point.PointUtils;
 import com.ulfric.commons.spigot.service.ServiceUtils;
 import com.ulfric.commons.spigot.shape.Point;
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;
 import com.ulfric.dragoon.inject.Inject;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
+import org.bukkit.Bukkit;
 import org.bukkit.util.Vector;
 
 public class PlotsService implements Plots, Service {
@@ -37,6 +39,8 @@ public class PlotsService implements Plots, Service {
 	{
 		gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
 		loadPlots();
+		Bukkit.getScheduler().runTaskTimerAsynchronously(PluginUtils.getMainPlugin(), () ->
+				generatePlot(UUID.randomUUID()), 0, 2);
 	}
 
 	@Override
@@ -78,25 +82,28 @@ public class PlotsService implements Plots, Service {
 		{
 			for (Point base : bases)
 			{
-				if (plot != null)
+				if (base != null)
 				{
-					break;
-				}
-				for (Vector direction : PlotConfig.DIRECTIONS)
-				{
-					plot = new Plot(owner, base, direction);
-					if (checkCombinations(plot))
+					if (plot != null)
 					{
 						break;
 					}
-					else
+					for (Vector direction : PlotConfig.DIRECTIONS)
 					{
-						plot = null;
+						plot = new Plot(owner, base, direction);
+						if (checkCombinations(plot))
+						{
+							break;
+						}
+						else
+						{
+							plot = null;
+						}
 					}
-				}
-				if (plot == null)
-				{
-					failedBases.add(base);
+					if (plot == null)
+					{
+						failedBases.add(base);
+					}
 				}
 			}
 		}
@@ -174,8 +181,8 @@ public class PlotsService implements Plots, Service {
 	@Override
 	public Set<Point> sortPlotsByRadius(Point center, Set<Plot> plots)
 	{
-		List<Point> bases = new ArrayList<>();
-		plots.parallelStream().filter(plot -> !(failedBases.contains(plot.getBase()) && failedBases
+		Set<Point> bases = ConcurrentHashMap.newKeySet();
+		plots.parallelStream().filter(Objects::nonNull).filter(plot -> !(failedBases.contains(plot.getBase()) && failedBases
 				.contains(plot.getFurthestXZ()))).forEach(plot ->
 		{
 			if (!bases.contains(plot.getBase()))
@@ -187,7 +194,7 @@ public class PlotsService implements Plots, Service {
 				bases.add(plot.getFurthestXZ());
 			}
 		});
-		bases.sort((o1, o2) ->
+		bases.parallelStream().filter(Objects::nonNull).collect(Collectors.toList()).sort((o1, o2) ->
 		{
 			double d1 = PointUtils.substract(center, o1).length();
 			double d2 = PointUtils.substract(center, o2).length();
