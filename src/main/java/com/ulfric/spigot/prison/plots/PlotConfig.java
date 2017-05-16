@@ -9,6 +9,6 @@ public class PlotConfig {
 
 	public static final int SIDE_LENGTH = 30;
 
-	public static final String worldName = "Plots";
+	public static final String worldName = "world";
 
 }

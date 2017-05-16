@@ -8,11 +8,6 @@ import org.bukkit.util.Vector;
 
 public interface Plots extends Listener {
 
-	static PlotsService getService()
-	{
-		return PlotsService.instance;
-	}
-
 	void loadPlots();
 
 	void savePlots();

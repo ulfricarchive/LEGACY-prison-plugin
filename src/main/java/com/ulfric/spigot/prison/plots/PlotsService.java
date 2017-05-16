@@ -2,9 +2,13 @@ package com.ulfric.spigot.prison.plots;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.ulfric.commons.service.Service;
 import com.ulfric.commons.spigot.point.PointUtils;
+import com.ulfric.commons.spigot.service.ServiceUtils;
 import com.ulfric.commons.spigot.shape.Point;
+import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;
+import com.ulfric.dragoon.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -15,40 +19,53 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.bukkit.util.Vector;
 
-public class PlotsService implements Plots {
+public class PlotsService implements Plots, Service {
 
-	private static PlotsService instance;
 	private ConcurrentMap<UUID, Set<Plot>> mappedPlots = new ConcurrentHashMap<>();
 	private Set<Point> failedBases = ConcurrentHashMap.newKeySet();
 	private Gson gson;
+	@Inject
+	Container container;
+
+	public static Plots getService()
+	{
+		return ServiceUtils.getService(PlotsService.class);
+	}
 
 	@Initialize
 	private void initialize()
 	{
-		instance = this;
 		gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
+		loadPlots();
+		generatePlot(UUID.randomUUID());
+		generatePlot(UUID.randomUUID());
+		generatePlot(UUID.randomUUID());
+		generatePlot(UUID.randomUUID());
 	}
 
 	@Override
 	public void loadPlots()
 	{
 		//TODO deserialize plots
+		String plotData = "";
+		gson.fromJson(plotData, Plot.class);
 	}
 
 	@Override
 	public void savePlots()
 	{
-		mappedPlots.values().parallelStream().forEach(plots -> plots.forEach(this::savePlot));
+		getPlotList().forEach(this::savePlot);
 	}
 
 	private void savePlot(Plot plot)
 	{
 		//TODO save the json to a file
-		gson.toJson(plot);
+		System.out.println(gson.toJson(plot));
 	}
 
 	private void loadPlot(UUID owner)
 	{
+		//TODO read plotData from file
 		String plotData = "";
 		Plot plot = gson.fromJson(plotData, Plot.class);
 		addPlot(plot, owner);

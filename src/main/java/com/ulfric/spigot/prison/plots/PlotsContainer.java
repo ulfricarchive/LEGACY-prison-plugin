@@ -9,7 +9,6 @@ public class PlotsContainer extends Container {
 	private void initialize()
 	{
 		this.install(PlotsService.class);
-		PlotsService.getService().loadPlots();
 	}
 
 	@Override
