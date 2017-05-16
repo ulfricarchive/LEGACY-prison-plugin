@@ -1,4 +1,4 @@
-package com.ulfric.spigot.prison.plots;
+package com.ulfric.spigot.prison.plots.impl;
 
 import org.bukkit.util.Vector;
 

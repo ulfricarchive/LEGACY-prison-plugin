@@ -1,4 +1,4 @@
-package com.ulfric.spigot.prison.plots;
+package com.ulfric.spigot.prison.plots.impl;
 
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;

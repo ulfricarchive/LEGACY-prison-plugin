@@ -1,33 +1,31 @@
-package com.ulfric.spigot.prison.plots;
+package com.ulfric.spigot.prison.plots.impl;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.ulfric.commons.service.Service;
-import com.ulfric.commons.spigot.plugin.PluginUtils;
 import com.ulfric.commons.spigot.point.PointUtils;
 import com.ulfric.commons.spigot.service.ServiceUtils;
 import com.ulfric.commons.spigot.shape.Point;
 import com.ulfric.dragoon.container.Container;
 import com.ulfric.dragoon.initialize.Initialize;
 import com.ulfric.dragoon.inject.Inject;
+import com.ulfric.spigot.prison.plots.Plot;
+import com.ulfric.spigot.prison.plots.Plots;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
-import org.bukkit.Bukkit;
 import org.bukkit.util.Vector;
 
 public class PlotsService implements Plots, Service {
 
-	private ConcurrentMap<UUID, Set<Plot>> mappedPlots = new ConcurrentHashMap<>();
-	private Set<Point> failedBases = ConcurrentHashMap.newKeySet();
-	private Gson gson;
 	@Inject
 	Container container;
+	private ConcurrentMap<UUID, Set<Plot>> mappedPlots = new ConcurrentHashMap<>();
+	private Set<Point> failedBases = ConcurrentHashMap.newKeySet();
 
 	public static Plots getService()
 	{
@@ -37,38 +35,34 @@ public class PlotsService implements Plots, Service {
 	@Initialize
 	private void initialize()
 	{
-		gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
 		loadPlots();
-		Bukkit.getScheduler().runTaskTimerAsynchronously(PluginUtils.getMainPlugin(), () ->
-				generatePlot(UUID.randomUUID()), 0, 2);
 	}
 
 	@Override
 	public void loadPlots()
 	{
 		//TODO deserialize plots
-		String plotData = "";
-		gson.fromJson(plotData, Plot.class);
 	}
 
 	@Override
 	public void savePlots()
 	{
-		getPlotList().forEach(this::savePlot);
+		getPlotList().stream().filter(Objects::nonNull).forEach(this::savePlot);
 	}
 
 	private void savePlot(Plot plot)
 	{
 		//TODO save the json to a file
-		System.out.println(gson.toJson(plot));
+		System.out.println("-----------");
+		System.out.println(plot.getBase());
+		System.out.println(plot.getDirection());
+		System.out.println(plot.getUuid());
+		System.out.println("-----------");
 	}
 
 	private void loadPlot(UUID owner)
 	{
-		//TODO read plotData from file
-		String plotData = "";
-		Plot plot = gson.fromJson(plotData, Plot.class);
-		addPlot(plot, owner);
+		//TODO load the json from a file
 	}
 
 	@Override
@@ -90,7 +84,7 @@ public class PlotsService implements Plots, Service {
 					}
 					for (Vector direction : PlotConfig.DIRECTIONS)
 					{
-						plot = new Plot(owner, base, direction);
+						plot = new TestPlot(base, direction);
 						if (checkCombinations(plot))
 						{
 							break;
@@ -109,22 +103,28 @@ public class PlotsService implements Plots, Service {
 		}
 		else
 		{
-			plot = new Plot(owner, Point.ZERO, PlotConfig.DIRECTIONS[0]);
+			plot = new TestPlot(Point.ZERO, PlotConfig.DIRECTIONS[0]);
 		}
 		if (plot != null)
 		{
-			addPlot(plot, owner);
+			addPlot(new PlayerPlot(owner, plot.getBase(), plot.getDirection()));
 		}
 		System.out.println((System.currentTimeMillis() - start) + " --- " + plots.size());
 		return plot;
 	}
 
-	private void addPlot(Plot plot, UUID owner)
+	private void addPlot(Plot plot)
 	{
 		Set<Plot> ownerPlots = new HashSet<>();
-		if (mappedPlots.containsKey(owner))
+		UUID owner = null;
+		if (plot instanceof PlayerPlot)
 		{
-			ownerPlots = mappedPlots.get(owner);
+			PlayerPlot playerPlot = (PlayerPlot) plot;
+			owner = playerPlot.getOwner();
+			if (mappedPlots.containsKey(owner))
+			{
+				ownerPlots = mappedPlots.get(owner);
+			}
 		}
 		ownerPlots.add(plot);
 		mappedPlots.put(owner, ownerPlots);
@@ -141,14 +141,15 @@ public class PlotsService implements Plots, Service {
 	public boolean checkCombinations(Plot plot)
 	{
 		Set<Plot> plots = getPlotList();
-		Plot plotX = new Plot(plot.getFurthestX(),
+		Plot plotX = new TestPlot(plot.getFurthestX(),
 				plot.getDirection().clone().multiply(new Vector(-1, 0, 1)));
-		Plot plotZ = new Plot(plot.getFurthestZ(),
+		Plot plotZ = new TestPlot(plot.getFurthestZ(),
 				plot.getDirection().clone().multiply(new Vector(1, 0, -1)));
-		Plot plotXZ = new Plot(plot.getFurthestXZ(),
+		Plot plotXZ = new TestPlot(plot.getFurthestXZ(),
 				plot.getDirection().clone().multiply(-1));
-		return !(plots.contains(plot) || plots.contains(plotX) || plots.contains(plotZ) || plots
-				.contains(plotXZ));
+		return !plots.parallelStream().anyMatch(
+				plot1 -> checkBaseDir(plot, plot1) || checkBaseDir(plotX, plot1) || checkBaseDir(plotZ,
+						plot1) || checkBaseDir(plotXZ, plot1));
 	}
 
 	@Override
@@ -169,7 +170,13 @@ public class PlotsService implements Plots, Service {
 	public Plot getPlotByUUID(UUID uuid)
 	{
 		Set<Plot> plots = getPlotList();
-		return plots.stream().filter(plot -> plot.getUuid().equals(uuid)).findFirst().get();
+		Optional<Plot> optional = plots.stream().filter(plot -> plot.getUuid().equals(uuid))
+				.findFirst();
+		if (optional.isPresent())
+		{
+			return optional.get();
+		}
+		return null;
 	}
 
 	@Override
@@ -182,8 +189,9 @@ public class PlotsService implements Plots, Service {
 	public Set<Point> sortPlotsByRadius(Point center, Set<Plot> plots)
 	{
 		Set<Point> bases = ConcurrentHashMap.newKeySet();
-		plots.parallelStream().filter(Objects::nonNull).filter(plot -> !(failedBases.contains(plot.getBase()) && failedBases
-				.contains(plot.getFurthestXZ()))).forEach(plot ->
+		plots.parallelStream().filter(Objects::nonNull)
+				.filter(plot -> !(failedBases.contains(plot.getBase()) && failedBases
+						.contains(plot.getFurthestXZ()))).forEach(plot ->
 		{
 			if (!bases.contains(plot.getBase()))
 			{
