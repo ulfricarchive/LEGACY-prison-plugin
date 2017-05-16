@@ -11,10 +11,4 @@ public class PlotsContainer extends Container {
 		this.install(PlotsService.class);
 	}
 
-	@Override
-	public void onDisable()
-	{
-		PlotsService.getService().savePlots();
-	}
-
 }

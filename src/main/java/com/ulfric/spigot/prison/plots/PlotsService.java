@@ -37,10 +37,6 @@ public class PlotsService implements Plots, Service {
 	{
 		gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
 		loadPlots();
-		generatePlot(UUID.randomUUID());
-		generatePlot(UUID.randomUUID());
-		generatePlot(UUID.randomUUID());
-		generatePlot(UUID.randomUUID());
 	}
 
 	@Override
